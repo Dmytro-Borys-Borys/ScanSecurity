@@ -3,16 +3,8 @@
 # Carpeta donde se encuentra nuestro script
 script_dir="$(dirname "$(realpath "$0")")"
 
-
-
-echo "$(dirname "script_dir")"
-
-echo $script_dir
-
 # El repositorio tiene que estar ubicado en un nivel superior
 repo_dir=$(dirname "$script_dir")
-echo $repo_dir
-
 
 declare -A files=(
     [$repo_dir/freeradius/clients.conf]="/etc/freeradius/3.0/clients.conf"
