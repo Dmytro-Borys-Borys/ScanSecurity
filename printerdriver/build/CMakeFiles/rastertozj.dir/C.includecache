@@ -1,0 +1,22 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/dima/proyecto/printerdriver/source/rastertozj.c
+cups/cups.h
+-
+cups/ppd.h
+-
+cups/raster.h
+-
+fcntl.h
+-
+signal.h
+-
+stdlib.h
+-
+

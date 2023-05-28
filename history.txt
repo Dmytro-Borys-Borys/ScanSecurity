@@ -1,0 +1,68 @@
+# Instalamos pip
+sudo apt install python3-pip
+
+# Instalamos pybluez  - no hizo falta porque va mal
+pip install pybluez
+
+#instalamos pyrad
+pip install pyrad
+
+#"/var/lib/freeradius/freeradius.db"
+
+# robo aquí https://github.com/zozs/wifi-user-mgmt/blob/master/wifi.sh
+
+#pip install qrcode[pil]
+#pip install pyqrcode
+#pip install pillow
+#pip install python-escpos
+
+sudo apt-get install libopenjp2-7
+
+#impresión USB
+sudo nano /etc/udev/rules.d/99-printer.rules
+SUBSYSTEM=="usb", ATTRS{idVendor}=="04b8", ATTRS{idProduct}=="0e03", MODE="0666", GROUP="dima"
+sudo udevadm control --reload-rules
+
+# git
+apt install git
+
+# controladora de la impresora https://github.com/klirichek/zj-58
+sudo apt install build-essential cmake libcups2-dev libcupsimage2-dev
+https://github.com/klirichek/zj-58.git
+git clone https://github.com/klirichek/zj-58.git printerdriver/source
+cd printerdriver
+ mkdir build && cd build && cmake ../source
+  cmake --build .
+
+  sudo make install
+
+
+#Install the necessary packages and dependencies:
+sudo apt update
+sudo apt install cups printer-driver-all
+
+
+#Add your user to the lpadmin group to have administrative privileges for managing printers:
+sudo usermod -aG lpadmin dima
+
+#Enable and start the CUPS service:
+sudo systemctl enable cups
+sudo systemctl start cups
+
+
+#List available printers:
+lpstat -p -d
+
+
+Add a new printer:
+lpadmin -p <printer_name> -E -v <printer_device> -P <ppd_file>
+Install the project...
+-- Install configuration: "Release"
+-- Installing: /usr/lib/cups/filter/rastertozj
+-- Installing: /usr/share/cups/model/zjiang/zj58.ppd
+-- Installing: /usr/share/cups/model/zjiang/zj80.ppd
+# add printer with driver
+sudo lpadmin -p TM-T20 -v usb://04b8/0e03 -P /usr/share/cups/model/zjiang/zj80.ppd
+lpadmin: Printer drivers are deprecated and will stop working in a future version of CUPS.
+# set default
+sudo lpadmin -d
