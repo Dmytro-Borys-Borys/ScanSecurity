@@ -1,1 +1,0 @@
-/usr/bin/cc -O3 -DNDEBUG -rdynamic CMakeFiles/rastertozj.dir/rastertozj.c.o -o rastertozj  -lcups -lcupsimage 

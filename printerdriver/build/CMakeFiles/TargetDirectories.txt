@@ -1,9 +1,0 @@
-/home/dima/proyecto/printerdriver/build/CMakeFiles/install/strip.dir
-/home/dima/proyecto/printerdriver/build/CMakeFiles/install.dir
-/home/dima/proyecto/printerdriver/build/CMakeFiles/install/local.dir
-/home/dima/proyecto/printerdriver/build/CMakeFiles/rebuild_cache.dir
-/home/dima/proyecto/printerdriver/build/CMakeFiles/edit_cache.dir
-/home/dima/proyecto/printerdriver/build/CMakeFiles/list_install_components.dir
-/home/dima/proyecto/printerdriver/build/CMakeFiles/package_source.dir
-/home/dima/proyecto/printerdriver/build/CMakeFiles/package.dir
-/home/dima/proyecto/printerdriver/build/CMakeFiles/rastertozj.dir
