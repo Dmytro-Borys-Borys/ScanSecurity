@@ -11,3 +11,4 @@ freeradius/default
 freeradius/sql
 hostapd/hostapd.conf
 nodogsplash/nodogsplash.conf
+lighttpd/php/radius
