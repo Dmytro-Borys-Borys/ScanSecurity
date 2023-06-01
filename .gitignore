@@ -1,9 +1,8 @@
 __pycache__/*
 ignores/*
-
+images/*
 config/authconfig.txt
 config/netconfig.txt
-
 dnsmasq/dnsmasq.conf
 freeradius/freeradius.db
 freeradius/clients.conf
@@ -11,4 +10,3 @@ freeradius/default
 freeradius/sql
 hostapd/hostapd.conf
 nodogsplash/nodogsplash.conf
-lighttpd/php/radius
