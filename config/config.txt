@@ -2,6 +2,11 @@ CONFIG_DIR="$(dirname "$(readlink -f "$BASH_SOURCE")")"
 BASE_DIR="$(dirname "$CONFIG_DIR")"
 NETWORK_CONFIG="${CONFIG_DIR}/netconfig.txt"
 AUTH_CONFIG="${CONFIG_DIR}/authconfig.txt"
+RADIUS_DB="/etc/freeradius/3.0/freeradius.db"
+
+
+NDS_PAGE="splash.html"
+NDS_LOGO="52.webp"
 
 set_scriptdir() {
     local location="$1"

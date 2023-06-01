@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+  <!-- Meta etiquetas requeridas -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Bootstrap CSS -->
+  <link href="bootstrap.min.css" rel="stylesheet">
+  <title>$gatewayname</title>
+  <style>
+    /* Estilos para el formulario */
+    form {
+      border: 3px solid #f1f1f1;
+      max-width: 400px;
+      margin: auto;
+      padding: 15px;
+    }
+
+    /* Estilos para los campos de entrada */
+    input[type=text],
+    input[type=password] {
+      width: 100%;
+      padding: 12px 20px;
+      margin: 8px 0;
+      display: inline-block;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+
+    /* Estilos para el botón */
+    button {
+      background-color: #04AA6D;
+      color: white;
+      padding: 14px 20px;
+      margin: 8px 0;
+      border: none;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    /* Estilos para el título */
+    h1 {
+      text-align: center;
+    }
+
+    /* Estilos para el icono */
+    img {
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+      width: 40%;
+    }
+  </style>
+  <script>
+    // Función para obtener el valor de un parámetro de URL por nombre
+    function getURLParameter(name) {
+      name = name.replace(/[[]/, '\\[').replace(/[\]]/, '\\]');
+      var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+      var results = regex.exec(location.search);
+      return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+    }
+
+    // Función para rellenar los campos del formulario con los valores de los parámetros de URL y simular clic en el botón de envío
+    function preFillForm() {
+      var username = getURLParameter('username');
+      var password = getURLParameter('password');
+
+      document.getElementById('username').value = username;
+      document.getElementById('password').value = password;
+
+      if (username !== '' && password !== '') {
+        var submitButton = document.querySelector('input[type="submit"]');
+        if (submitButton) {
+          submitButton.click();
+        }
+      }
+    }
+  </script>
+</head>
+
+<body onload="preFillForm()">
+  <form method="GET" action="$authaction">
+    <input type="hidden" name="tok" value="$tok">
+    <input type="hidden" name="redir" value="$redir">
+    <img src="images/52.webp" alt="Logo">
+    <h1>$gatewayname - Inicio de sesión</h1>
+    <div>
+      <label for="username"><b>Nombre de usuario</b></label>
+      <input type="text" placeholder="Ingresa el nombre de usuario" name="username" id="username" required>
+    </div>
+    <div>
+      <label for="password"><b>Contraseña</b></label>
+      <input type="password" placeholder="Ingresa la contraseña" name="password" id="password" required>
+    </div>
+    <div>
+      <button type="submit">Iniciar sesión</button>
+    </div>
+  </form>
+</body>
+
+</html>

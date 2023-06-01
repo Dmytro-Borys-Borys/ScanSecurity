@@ -1,6 +1,12 @@
-#!/bin/sh
+#!/bin/bash
 
-DATABASE_FILE="/home/dima/proyecto/freeradius.db"
+# Cargando settings generales
+source "config/config.txt"
+set_scriptdir "$BASH_SOURCE"
+
+# Cargando settings de red
+attempt_to_load "$NETWORK_CONFIG"
+
 DEFAULT_LOGIN_LEN=8
 DEFAULT_PASSWORD_LEN=10
 
@@ -11,7 +17,7 @@ login=$(cat /dev/urandom | tr -dc 'a-z' | fold -w $DEFAULT_LOGIN_LEN | head -n 1
 password=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w $DEFAULT_PASSWORD_LEN | head -n 1)
 
 sqlite_sql() {
-	echo $(sqlite3 "$DATABASE_FILE" "$1")
+	echo $(sudo sqlite3 "$RADIUS_DB" "$1")
 }
 
 
@@ -33,4 +39,4 @@ echo "$login $password $hash"
 # Now insert the user into the database.
 sqlite_sql "INSERT INTO radcheck (username,attribute,op,value) VALUES ('$login','NT-Password',':=','$hash');"
 
-python3 qrcode.py $login $password
+python3 qrcode.py $login $password $AP_IP $AP_SSID
