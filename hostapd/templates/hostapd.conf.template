@@ -1,0 +1,6 @@
+interface=$AP_INTERFACE
+ssid=$AP_SSID
+hw_mode=g
+channel=$AP_CHANNEL
+auth_algs=1
+wpa=0

@@ -1,0 +1,7 @@
+interface=${AP_INTERFACE}
+domain-needed
+bogus-priv
+bind-interfaces
+dhcp-range=${AP_DHCP_RANGE},${AP_NETMASK},12h
+dhcp-option=3,${AP_IP}
+dhcp-option=6,${WAN_DNS}

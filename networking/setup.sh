@@ -6,7 +6,6 @@ source "../config/config.txt"
 # Cargando settings de red
 attempt_to_load "$NETWORK_CONFIG"
 
-
 # Define la nueva configuración utilizando las variables
 new_config="auto $AP_INTERFACE
 iface $AP_INTERFACE inet static
@@ -17,4 +16,4 @@ iface $AP_INTERFACE inet static
 sudo sed -n -i -e "/^auto $AP_INTERFACE/,/^$/d" /etc/network/interfaces
 
 # Agrega la nueva configuración a /etc/network/interfaces
-echo "$new_config" | sudo tee -a /etc/network/interfaces > /dev/null
+echo "$new_config" | sudo tee -a /etc/network/interfaces >/dev/null
