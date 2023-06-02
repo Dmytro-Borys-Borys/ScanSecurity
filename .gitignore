@@ -9,4 +9,6 @@ freeradius/clients.conf
 freeradius/default
 freeradius/sql
 hostapd/hostapd.conf
+nodogsplash/auth.sh
 nodogsplash/nodogsplash.conf
+nodogsplash/*.htm*

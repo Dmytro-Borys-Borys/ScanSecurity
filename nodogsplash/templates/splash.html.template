@@ -1,13 +1,13 @@
 <!doctype html>
-<html lang="es">
+<html lang=\"es\">
 
 <head>
   <!-- Meta etiquetas requeridas -->
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset=\"utf-8\">
+  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">
   <!-- Bootstrap CSS -->
-  <link href="bootstrap.min.css" rel="stylesheet">
-  <title>$gatewayname</title>
+  <link href=\"bootstrap.min.css\" rel=\"stylesheet\">
+  <title>\$gatewayname</title>
   <style>
     /* Estilos para el formulario */
     form {
@@ -55,8 +55,8 @@
   <script>
     // Función para obtener el valor de un parámetro de URL por nombre
     function getURLParameter(name) {
-      name = name.replace(/[[]/, '\\[').replace(/[\]]/, '\\]');
-      var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+      name = name.replace(/[[]/, '\\\\[').replace(/[\]]/, '\\\\]');
+      var regex = new RegExp('[\\\\?&]' + name + '=([^&#]*)');
       var results = regex.exec(location.search);
       return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
     }
@@ -70,7 +70,7 @@
       document.getElementById('password').value = password;
 
       if (username !== '' && password !== '') {
-        var submitButton = document.querySelector('input[type="submit"]');
+        var submitButton = document.querySelector('input[type=\"submit\"]');
         if (submitButton) {
           submitButton.click();
         }
@@ -79,22 +79,22 @@
   </script>
 </head>
 
-<body onload="preFillForm()">
-  <form method="GET" action="$authaction">
-    <input type="hidden" name="tok" value="$tok">
-    <input type="hidden" name="redir" value="$redir">
-    <img src="images/52.webp" alt="Logo">
-    <h1>$gatewayname - Inicio de sesión</h1>
+<body onload=\"preFillForm()\">
+  <form method=\"GET\" action=\"\$authaction\">
+    <input type=\"hidden\" name=\"tok\" value=\"\$tok\">
+    <input type=\"hidden\" name=\"redir\" value=\"\$redir\">
+    <img src=\"images/${NDS_LOGO}\" alt=\"Logo\">
+    <h1>\$gatewayname - Inicio de sesión</h1>
     <div>
-      <label for="username"><b>Nombre de usuario</b></label>
-      <input type="text" placeholder="Ingresa el nombre de usuario" name="username" id="username" required>
+      <label for=\"username\"><b>Nombre de usuario</b></label>
+      <input type=\"text\" placeholder=\"Ingresa el nombre de usuario\" name=\"username\" id=\"username\" required>
     </div>
     <div>
-      <label for="password"><b>Contraseña</b></label>
-      <input type="password" placeholder="Ingresa la contraseña" name="password" id="password" required>
+      <label for=\"password\"><b>Contraseña</b></label>
+      <input type=\"password\" placeholder=\"Ingresa la contraseña\" name=\"password\" id=\"password\" required>
     </div>
     <div>
-      <button type="submit">Iniciar sesión</button>
+      <button type=\"submit\">Iniciar sesión</button>
     </div>
   </form>
 </body>

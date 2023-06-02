@@ -1,0 +1,29 @@
+GatewayInterface $AP_INTERFACE
+GatewayAddress $AP_IP
+GatewayName $AP_SSID
+GatewayPort 2050
+
+BinAuth $auth_link
+
+FirewallRuleSet authenticated-users {
+    FirewallRule allow tcp port 53	
+    FirewallRule allow udp port 53	
+    FirewallRule allow tcp port 80
+    FirewallRule allow tcp port 443
+}
+
+FirewallRuleSet preauthenticated-users {
+    FirewallRule allow tcp port 53	
+    FirewallRule allow udp port 53
+}
+
+FirewallRuleSet users-to-router {
+    FirewallRule allow udp port 53	
+    FirewallRule allow tcp port 53	
+    FirewallRule allow udp port 67
+}
+
+MaxClients $AP_MAXCLIENTS
+
+
+DebugLevel 3

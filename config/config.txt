@@ -1,85 +1,135 @@
+# Carpeta de configuración
 CONFIG_DIR="$(dirname "$(readlink -f "$BASH_SOURCE")")"
+# Carpeta raíz del proyecto
 BASE_DIR="$(dirname "$CONFIG_DIR")"
+# Archivo de ajustes de red
 NETWORK_CONFIG="${CONFIG_DIR}/netconfig.txt"
+# Archivo de ajustes de autenticación
 AUTH_CONFIG="${CONFIG_DIR}/authconfig.txt"
+
+# ---- RUTAS -----
+# Ruta de base datos de FreeRADIUS
 RADIUS_DB="/etc/freeradius/3.0/freeradius.db"
-
-
+# Nombre de la página web NoDogSplash
 NDS_PAGE="splash.html"
+# Nombre del logotipo NoDogSplash (dentro de la carpeta /images)
 NDS_LOGO="52.webp"
 
+# ===== FUNCIONES =====
+
+# Función que establece la variable SCRIPT_DIR con la ruta del directorio del script actual.
+# Parámetros:
+#   - location: la ubicación del script actual.
 set_scriptdir() {
     local location="$1"
     SCRIPT_DIR="$(dirname "$(readlink -f "$location")")"
 }
 
+# Intenta cargar un archivo y muestra un mensaje de error si no se encuentra.
+# Parámetros:
+#   - file: el archivo a cargar.
 attempt_to_load() {
     local file="$1"
 
-    # Check if the file exists
+    # Comprueba si el archivo existe
     if [ ! -f "$file" ]; then
-    echo "File not found: $file"
-    exit 1  # Terminate the script with a non-zero exit code
+        echo "File not found: $file"
+        exit 1 # Termina el script con un código de salida no cero
     fi
 
-    # Continue with the rest of the script if the file exists
+    # Continúa con el resto del script si el archivo existe
     source "$file"
     echo "File loaded: $file"
 }
 
+# Crea un enlace simbólico desde una ruta de destino a una ruta de enlace especificada y cambia el propietario.
+# Parámetros:
+#   - target_path: la ruta de destino del enlace simbólico.
+#   - link_path: la ruta del enlace simbólico a crear.
+#   - owner: el propietario del enlace simbólico.
 create_symbolic_link() {
     local target_path="$1"
     local link_path="$2"
     local owner="$3"
 
-    # Borrar el archivo si ya existe
+    # Borra el archivo si ya existe
     delete_if_exists "$link_path"
 
-    # Crear un enlace simbólico
+    # Crea un enlace simbólico
     sudo ln -sv "$target_path" "$link_path"
 
-
-    # Cambiar el dueño
+    # Cambia el dueño del enlace
     sudo chown -v "$owner:$owner" "$link_path"
 }
 
+# Elimina un archivo o directorio si existe.
+# Parámetros:
+#   - file: el archivo o directorio a eliminar.
 delete_if_exists() {
-    local file="$1"
 
+    local file="$1"
     if [ -e "$file" ]; then
-        if [ -d "$file" ]; then
-            # Delete the directory and its contents with force
-            sudo rm -rfv "$file"
-        elif [ -L "$file" ]; then
-            # Delete the symbolic link
-            sudo rm -v "$file"
-        else
-            # Delete the file
-            sudo rm -v "$file"
-        fi
+        # borrando archivo
+        sudo rm -v "$file"
+    fi
+    if [[ -L "$file" ]] && [[ ! -e "$file" ]]; then
+        # borrando enlace roto
+        echo "'$file' is a broken symlink"
+        sudo rm -v "$file"
     fi
 }
 
-
-write_template_to_file() {
-    local template="$1"
-    local target_file="$2"
-
-    # Borrar el archivo si ya existe
-    delete_if_exists "$target_file"
-    echo "$template" > "$target_file"
-    echo "written '$target_file'"
-}
-
+# Agrega una línea al archivo /etc/rc.local justo antes de "exit 0".
+# Parámetros:
+#   - line: la línea a agregar.
 add_to_rc_local() {
-    line=$1
-    file="/etc/rc.local"
-    # Check if the line exists in the file
+    local line="$1"
+    local file="/etc/rc.local"
+
+    # Comprueba si la línea existe en el archivo
     if grep -qF "$line" "$file"; then
         echo "Line already exists in $file"
     else
-        # Add the line above "exit 0" in the file
+        # Agrega la línea antes de "exit 0" en el archivo
         sudo sed -i "/^exit 0/i $line" "$file"
         echo "Line added to $file"
     fi
+}
+
+# Procesa una plantilla.
+# Parámetros:
+#   - template_path: la ruta de la plantilla a procesar.
+process_template() {
+    local template_path="$1"
+    local template_dir=$(dirname "$template_path")
+    local template_name=$(basename "$template_path")
+    local output_name="${template_name%.template}"    # Elimina la extensión '.template' del nombre de la plantilla
+    local output_path="$template_dir/../$output_name" # Mueve un nivel hacia arriba y construye la ruta de salida
+
+    local template=$(eval "cat \"$template_path\"") # Evalúa y sustituye las variables en la plantilla
+
+    # Elimina el archivo de salida si ya existe
+    delete_if_exists "$output_path"
+
+    local processed_template=$(eval "echo \"$template\"") # Evalúa y sustituye las variables en la plantilla
+    echo "$processed_template" >"$output_path"
+    echo "Written '$output_path'"
+}
+
+# Procesa todas las plantillas en el directorio de templates.
+process_all_templates() {
+    local template_dir="$SCRIPT_DIR/templates"
+
+    # Comprueba si el directorio existe
+    if [ ! -d "$template_dir" ]; then
+        echo "Directorio de plantillas no encontrado: $template_dir"
+        exit 1
+    fi
+
+    # Procesa cada archivo de plantilla
+    for template_file in "$template_dir"/*.template; do
+        if [ -f "$template_file" ]; then
+            process_template "$template_file"
+        fi
+    done
 }
