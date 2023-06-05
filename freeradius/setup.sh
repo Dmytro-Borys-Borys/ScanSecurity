@@ -7,6 +7,15 @@ set_scriptdir "$BASH_SOURCE"
 # Cargando settings de red
 attempt_to_load "$AUTH_CONFIG"
 
+if command -v freeradius &>/dev/null; then
+    echo "freeradius está instalado"
+else
+    echo "freeradius no está instalado"
+
+    # Instalando freeradius
+    sudo apt install freeradius -y
+fi
+
 schema_file="/etc/freeradius/3.0/mods-config/sql/main/sqlite/schema.sql"
 
 if [[ ! -d "$RADIUS_DB_FOLDER" ]]; then
@@ -15,7 +24,7 @@ if [[ ! -d "$RADIUS_DB_FOLDER" ]]; then
 fi
 
 # Comprueba si el archivo de la base de datos ya existe
-if [[ ! -f "$RADIUS_DB" ]]; then
+if ! sudo -u freerad test ! -f "$RADIUS_DB"; then
 	# Comprueba si el archivo de esquema existe
 	if [[ ! -f "$schema_file" ]]; then
 		echo "Archivo de esquema no encontrado: $schema_file"
@@ -34,6 +43,9 @@ if [[ ! -f "$RADIUS_DB" ]]; then
 fi
 
 process_all_templates
+delete_if_exists "/etc/freeradius/3.0/clients.conf"
 create_symbolic_link "$SCRIPT_DIR/clients.conf" "/etc/freeradius/3.0/clients.conf" "freerad"
+delete_if_exists "/etc/freeradius/3.0/mods-enabled/sql"
 create_symbolic_link "$SCRIPT_DIR/sql" "/etc/freeradius/3.0/mods-enabled/sql" "freerad"
+delete_if_exists "/etc/freeradius/3.0/sites-enabled/default"
 create_symbolic_link "$SCRIPT_DIR/default" "/etc/freeradius/3.0/sites-enabled/default" "freerad"
