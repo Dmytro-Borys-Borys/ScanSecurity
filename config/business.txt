@@ -1,0 +1,5 @@
+BUSINESS_NAME="Asador Argentino"
+BUSINESS_ADDRESS="C. Los Gamusinos 1, Liébana"
+NDS_LOGO="megalogo.png"
+TICKET_LOGO_TEXT="LogoNotBlack.jpg"
+TICKET_LOGO_IMAGE="ultralogo.png"

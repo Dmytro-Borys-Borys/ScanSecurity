@@ -6,6 +6,8 @@ BASE_DIR="$(dirname "$CONFIG_DIR")"
 NETWORK_CONFIG="${CONFIG_DIR}/netconfig.txt"
 # Archivo de ajustes de autenticación
 AUTH_CONFIG="${CONFIG_DIR}/authconfig.txt"
+# Archivo de ajustes de la empresa
+BUSINESS_CONFIG="${CONFIG_DIR}/business.txt"
 
 # ---- RUTAS -----
 # Ruta de base datos de FreeRADIUS
@@ -13,7 +15,7 @@ RADIUS_DB="/etc/freeradius/3.0/freeradius.db"
 # Nombre de la página web NoDogSplash
 NDS_PAGE="splash.html"
 # Nombre del logotipo NoDogSplash (dentro de la carpeta /images)
-NDS_LOGO="52.webp"
+
 
 # ===== FUNCIONES =====
 

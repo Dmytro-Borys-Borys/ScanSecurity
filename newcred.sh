@@ -6,6 +6,7 @@ set_scriptdir "$BASH_SOURCE"
 
 # Cargando settings de red
 attempt_to_load "$NETWORK_CONFIG"
+attempt_to_load "$BUSINESS_CONFIG"
 
 DEFAULT_LOGIN_LEN=8
 DEFAULT_PASSWORD_LEN=10
@@ -39,4 +40,4 @@ echo "$login $password $hash"
 # Now insert the user into the database.
 sqlite_sql "INSERT INTO radcheck (username,attribute,op,value) VALUES ('$login','NT-Password',':=','$hash');"
 
-python3 qrcode.py $login $password $AP_IP $AP_SSID
+python3 qrcode.py "$login" "$password" "$AP_IP" "$AP_SSID" "1" "$BUSINESS_NAME" "$BUSINESS_ADDRESS" "images/$TICKET_LOGO_TEXT" "images/$TICKET_LOGO_IMAGE"

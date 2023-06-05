@@ -5,6 +5,7 @@ source "../config/config.txt"
 set_scriptdir "$BASH_SOURCE"
 # Cargando settings de red
 attempt_to_load "$AUTH_CONFIG"
+attempt_to_load "$BUSINESS_CONFIG"
 
 # Comprobar si nodogsplash se encuentra instalado
 if command -v nodogsplash &>/dev/null; then
@@ -31,10 +32,12 @@ fi
 # Cargando settings de red
 attempt_to_load "$NETWORK_CONFIG"
 
-process_all_templates
-
 auth_script="$SCRIPT_DIR/auth.sh"
 auth_link="/etc/nodogsplash/auth.sh"
+
+process_all_templates
+
+
 
 chmod +x "$auth_script"
 create_symbolic_link $auth_script $auth_link "root"

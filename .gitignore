@@ -12,3 +12,5 @@ hostapd/hostapd.conf
 nodogsplash/auth.sh
 nodogsplash/nodogsplash.conf
 nodogsplash/*.htm*
+output.txt
+ticket.png
