@@ -1,3 +1,5 @@
-## ScanSecurity
+# ScanSecurity
 
-# Proyecto serio para empresas serias.
+## Soluciones inalámbricas para PYMEs
+
+#### Realizado por Pedro Martín, Dmytro Borys
