@@ -9,10 +9,13 @@ attempt_to_load "$AUTH_CONFIG"
 
 schema_file="/etc/freeradius/3.0/mods-config/sql/main/sqlite/schema.sql"
 
+if [[ ! -d "$RADIUS_DB_FOLDER" ]]; then
+    sudo mkdir -pv "$RADIUS_DB_FOLDER"
+	sudo chown -R freerad:freerad "$RADIUS_DB_FOLDER"
+fi
+
 # Comprueba si el archivo de la base de datos ya existe
-if [[ -f "$RADIUS_DB" ]]; then
-	echo "El archivo de la base de datos ya existe."
-else
+if [[ ! -f "$RADIUS_DB" ]]; then
 	# Comprueba si el archivo de esquema existe
 	if [[ ! -f "$schema_file" ]]; then
 		echo "Archivo de esquema no encontrado: $schema_file"

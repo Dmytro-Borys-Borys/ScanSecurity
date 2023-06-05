@@ -11,7 +11,9 @@ BUSINESS_CONFIG="${CONFIG_DIR}/business.txt"
 
 # ---- RUTAS -----
 # Ruta de base datos de FreeRADIUS
-RADIUS_DB="/etc/freeradius/3.0/freeradius.db"
+RADIUS_DB_FOLDER="/opt/freeradius"
+RADIUS_DB_FILENAME="freeradius.db"
+RADIUS_DB=${RADIUS_DB_FOLDER}/${RADIUS_DB_FILENAME}
 # Nombre de la página web NoDogSplash
 NDS_PAGE="splash.html"
 # Nombre del logotipo NoDogSplash (dentro de la carpeta /images)
