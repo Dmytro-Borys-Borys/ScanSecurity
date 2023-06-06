@@ -43,15 +43,32 @@ while true; do
     else
         echo "Device is not paired. Pairing..."
 
-        # Start bluetoothctl in interactive mode
         bluetoothctl power on  # Ensure Bluetooth is powered on
         bluetoothctl agent on  # Enable agent for pairing
 
         # Set the device to broadcast mode and scan for devices
         bluetoothctl discoverable on
 
-        # Pair with the device
-        bluetoothctl pair "$BLUETOOTH_DEVICE"
+        # Run the "bluetoothctl scan on" command in the background and capture its PID
+        # bluetoothctl scan on & scan_pid=$!
+
+        # Loop until the device is paired or timeout occurs
+        while true; do
+            # Attempt to pair with the device
+            bluetoothctl connect  "$BLUETOOTH_DEVICE"
+
+            # Check the exit status of the previous command
+            if [ $? -eq 0 ]; then
+                # Pairing successful, break out of the loop
+                break
+            fi
+
+            # Sleep for a short period before the next attempt
+            sleep 1
+        done
+
+        # Kill the scan process
+        # kill "$scan_pid"
 
         # Trust and connect to the device
         bluetoothctl trust "$BLUETOOTH_DEVICE"
@@ -65,10 +82,10 @@ while true; do
 
         echo "Pairing completed."
     fi
-    # Intentar establecer conexión con el dispositivo
-    while ! bluetoothctl connect "$BLUETOOTH_DEVICE"; do
-        echo "Conexión fallida, intentando de nuevo..."
-    done
+    # # Intentar establecer conexión con el dispositivo
+    # while ! bluetoothctl connect "$BLUETOOTH_DEVICE"; do
+    #     echo "Conexión fallida, intentando de nuevo..."
+    # done
 
     # Verificar si se encuentra la secuencia de datos específica
     if sudo hcidump --raw | grep -q "$BLUETOOTH_DATA_SEQUENCE"; then
