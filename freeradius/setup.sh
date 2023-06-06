@@ -10,6 +10,7 @@ attempt_to_load "$AUTH_CONFIG"
 # Habilitando una carpeta para la base de datos
 if [[ ! -d "$RADIUS_DB_FOLDER" ]]; then
     sudo mkdir -pv "$RADIUS_DB_FOLDER"
+    sudo chmod -v a+w "$RADIUS_DB_FOLDER"
 fi
 
 # Instalando FreeRADIUS y sqlite3 si hace falta
