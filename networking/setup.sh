@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # Cargando settings generales
-source "../config/config.txt"
+set_scriptdir "$BASH_SOURCE"
+source "$BASH_SOURCE/../config/config.txt"
 
 # Cargando settings de red
 attempt_to_load "$NETWORK_CONFIG"
@@ -17,3 +18,6 @@ sudo sed -n -i -e "/^auto $AP_INTERFACE/,/^$/d" /etc/network/interfaces
 
 # Agrega la nueva configuración a /etc/network/interfaces
 echo "$new_config" | sudo tee -a /etc/network/interfaces >/dev/null
+
+rfkill unblock wifi
+sudo ip addr flush dev $AP_INTERFACE

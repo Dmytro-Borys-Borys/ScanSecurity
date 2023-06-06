@@ -11,6 +11,4 @@ GW_INTERFACE=eth0
 
 WAN_DNS=8.8.8.8
 
-SERVER_PORT=8000
-
 IPTABLES_FILE=/etc/iptables.ipv4.nat

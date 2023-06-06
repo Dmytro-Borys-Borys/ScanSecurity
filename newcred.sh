@@ -63,4 +63,4 @@ if [[ -n "$expiration" ]]; then
 fi
 
 # Generar el código QR
-python3 qrcode.py "$login" "$password" "$AP_IP" "$AP_SSID" "$expiration" "$BUSINESS_NAME" "$BUSINESS_ADDRESS" "images/$TICKET_LOGO_TEXT" "images/$TICKET_LOGO_IMAGE"
+python3 ${SCRIPT_DIR}/python/qrcode.py "$login" "$password" "$AP_IP" "$AP_SSID" "$expiration" "$BUSINESS_NAME" "$BUSINESS_ADDRESS" "images/$TICKET_LOGO_TEXT" "images/$TICKET_LOGO_IMAGE"

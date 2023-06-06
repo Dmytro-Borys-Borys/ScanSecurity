@@ -1,7 +1,8 @@
 #!/bin/sh
 
 # Cargando settings generales
-source "../config/config.txt"
+set_scriptdir "$BASH_SOURCE"
+source "$BASH_SOURCE/../config/config.txt"
 
 # Cargando settings de red
 attempt_to_load "$NETWORK_CONFIG"

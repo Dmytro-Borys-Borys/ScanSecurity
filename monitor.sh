@@ -15,6 +15,25 @@
 # Cargando la configuración de Bluetooth
 source "config/bluetooth.txt"
 
+#!/bin/bash
+
+# Check if hcidump is already installed
+if command -v hcidump &>/dev/null; then
+    echo "hcidump is already installed."
+else
+    # Check if apt package manager is available
+    if command -v apt-get &>/dev/null; then
+        echo "Installing hcidump using apt-get..."
+        sudo apt-get update
+        sudo apt-get install bluez-hcidump -y
+        echo "hcidump is now installed."
+    else
+        echo "apt-get package manager is not available. Please install bluez package manually to use hcidump."
+        exit 1
+    fi
+fi
+
+
 echo $BLUETOOTH_DEVICE $BLUETOOTH_DATA_SEQUENCE $BLUETOOTH_TIMEOUT
 
 while true; do

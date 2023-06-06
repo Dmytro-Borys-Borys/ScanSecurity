@@ -70,18 +70,18 @@ create_symbolic_link() {
 # Parámetros:
 #   - file: el archivo o directorio a eliminar.
 delete_if_exists() {
-
     local file="$1"
-    if [ -e "$file" ]; then
-        # borrando archivo
+    if sudo test -e "$file"; then
+        # Deleting file
         sudo rm -v "$file"
     fi
-    if [[ -L "$file" ]] && [[ ! -e "$file" ]]; then
-        # borrando enlace roto
+    if sudo test -L "$file" && ! sudo test -e "$file"; then
+        # Deleting broken symlink
         echo "'$file' is a broken symlink"
         sudo rm -v "$file"
     fi
 }
+
 
 # Agrega una línea al archivo /etc/rc.local justo antes de "exit 0".
 # Parámetros:
@@ -136,4 +136,20 @@ process_all_templates() {
             process_template "$template_file"
         fi
     done
+}
+
+# Verifica una dependencia y la instala si es necesario.
+# Parámetros:
+#   - command_name: el nombre del comando a verificar.
+#   - install_command: el comando para instalar la dependencia.
+verify_dependency() {
+    # Comprueba si el comando está instalado
+    if command -v "$1" >/dev/null 2>&1; then
+        echo "$1 ya está instalado."
+    else
+        echo "$1 no está instalado. Instalando..."
+        # Realiza la instalación utilizando el comando proporcionado
+        eval "$2"
+        echo "$1 ha sido instalado."
+    fi
 }

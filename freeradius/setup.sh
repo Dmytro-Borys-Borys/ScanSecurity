@@ -1,46 +1,43 @@
 #!/bin/bash
 
 # Cargando settings generales
-source "../config/config.txt"
 set_scriptdir "$BASH_SOURCE"
+source "$BASH_SOURCE/../config/config.txt"
 
 # Cargando settings de red
 attempt_to_load "$AUTH_CONFIG"
 
-if command -v freeradius &>/dev/null; then
-    echo "freeradius está instalado"
-else
-    echo "freeradius no está instalado"
-
-    # Instalando freeradius
-    sudo apt install freeradius -y
-fi
-
-schema_file="/etc/freeradius/3.0/mods-config/sql/main/sqlite/schema.sql"
-
+# Habilitando una carpeta para la base de datos
 if [[ ! -d "$RADIUS_DB_FOLDER" ]]; then
     sudo mkdir -pv "$RADIUS_DB_FOLDER"
-	sudo chown -R freerad:freerad "$RADIUS_DB_FOLDER"
 fi
 
-# Comprueba si el archivo de la base de datos ya existe
-if ! sudo -u freerad test ! -f "$RADIUS_DB"; then
-	# Comprueba si el archivo de esquema existe
-	if [[ ! -f "$schema_file" ]]; then
-		echo "Archivo de esquema no encontrado: $schema_file"
-	else
-		# Crea la base de datos SQLite y ejecuta el archivo schema.sql
-		sudo -u freerad sqlite3 "$RADIUS_DB" <"$schema_file"
+# Estableciendo los permisos de la carpeta de la base de datos
+sudo chown -R freerad:freerad "$RADIUS_DB_FOLDER"
 
-		# Comprueba si el archivo schema.sql se ejecutó correctamente
-		if [[ $? -eq 0 ]]; then
-			echo "La inicialización de la base de datos se realizó correctamente."
-		else
-			echo "Error al inicializar la base de datos."
-			exit 1
-		fi
-	fi
-fi
+# Instalando FreeRADIUS y sqlite3 si hace falta
+verify_dependency "freeradius" "sudo apt install freeradius -y"
+verify_dependency "sqlite3" "sudo apt install sqlite3 -y"
+
+# schema_file="/etc/freeradius/3.0/mods-config/sql/main/sqlite/schema.sql"
+# # Comprueba si el archivo de la base de datos ya existe
+# if ! sudo -u freerad test ! -f "$RADIUS_DB"; then
+# 	# Comprueba si el archivo de esquema existe
+# 	if [[ ! -f "$schema_file" ]]; then
+# 		echo "Archivo de esquema no encontrado: $schema_file"
+# 	else
+# 		# Crea la base de datos SQLite y ejecuta el archivo schema.sql
+# 		sudo -u freerad sqlite3 "$RADIUS_DB" <"$schema_file"
+
+# 		# Comprueba si el archivo schema.sql se ejecutó correctamente
+# 		if [[ $? -eq 0 ]]; then
+# 			echo "La inicialización de la base de datos se realizó correctamente."
+# 		else
+# 			echo "Error al inicializar la base de datos."
+# 			exit 1
+# 		fi
+# 	fi
+# fi
 
 process_all_templates
 delete_if_exists "/etc/freeradius/3.0/clients.conf"

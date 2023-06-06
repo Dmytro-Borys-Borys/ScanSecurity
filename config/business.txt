@@ -1,3 +1,5 @@
+# Datos de la empresa cliente para que salga en el ticket y en el portal
+
 BUSINESS_NAME="Asador Argentino"
 BUSINESS_ADDRESS="C. Los Gamusinos 1, Liébana"
 NDS_LOGO="megalogo.png"
