@@ -4,7 +4,6 @@ images/*
 dnsmasq/dnsmasq.conf
 freeradius/freeradius.db
 freeradius/clients.conf
-freeradius/default
 freeradius/sql
 hostapd/hostapd.conf
 nodogsplash/auth.sh
