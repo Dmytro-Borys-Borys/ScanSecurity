@@ -37,6 +37,34 @@ fi
 echo $BLUETOOTH_DEVICE $BLUETOOTH_DATA_SEQUENCE $BLUETOOTH_TIMEOUT
 
 while true; do
+
+    if bluetoothctl info "$BLUETOOTH_DEVICE" | grep -q "Paired: yes"; then
+        echo "Device is already paired."
+    else
+        echo "Device is not paired. Pairing..."
+
+        # Start bluetoothctl in interactive mode
+        bluetoothctl power on  # Ensure Bluetooth is powered on
+        bluetoothctl agent on  # Enable agent for pairing
+
+        # Set the device to broadcast mode and scan for devices
+        bluetoothctl discoverable on
+
+        # Pair with the device
+        bluetoothctl pair "$BLUETOOTH_DEVICE"
+
+        # Trust and connect to the device
+        bluetoothctl trust "$BLUETOOTH_DEVICE"
+        bluetoothctl connect "$BLUETOOTH_DEVICE"
+
+        # Turn off discoverable mode
+        bluetoothctl discoverable off
+
+        # Disable the agent
+        bluetoothctl agent off
+
+        echo "Pairing completed."
+    fi
     # Intentar establecer conexión con el dispositivo
     while ! bluetoothctl connect "$BLUETOOTH_DEVICE"; do
         echo "Conexión fallida, intentando de nuevo..."
