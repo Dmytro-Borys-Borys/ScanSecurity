@@ -1,5 +1,4 @@
 interface=${AP_INTERFACE}
-no-dhcp-interface=${AP_INTERFACE}
 domain-needed
 bogus-priv
 bind-interfaces
