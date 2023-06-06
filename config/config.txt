@@ -71,6 +71,10 @@ create_symbolic_link() {
 #   - file: el archivo o directorio a eliminar.
 delete_if_exists() {
     local file="$1"
+    if sudo test -d "$file"; then
+        # Deleting directory
+        sudo rm -rv "$file"
+    fi
     if sudo test -e "$file"; then
         # Deleting file
         sudo rm -v "$file"

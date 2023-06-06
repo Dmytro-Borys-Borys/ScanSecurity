@@ -11,7 +11,7 @@ for folder in "${subfolders[@]}"; do
   sudo chmod -x setup.sh
 
   # Ejecuta el archivo 'setup.sh'
-  ./setup.sh
+  sudo bash setup.sh
 
   cd ..  # Regresa al directorio anterior
 done
