@@ -23,5 +23,26 @@ sudo iptables -t nat -A POSTROUTING -o $GW_INTERFACE -j MASQUERADE
 # Guardar las reglas de iptables en un archivo
 sudo sh -c "iptables-save > $IPTABLES_FILE"
 
+#!/bin/bash
+
+ip_forward_value=$(sysctl -n net.ipv4.ip_forward)
+if [[ "$ip_forward_value" -eq 1 ]]; then
+    echo "IP forwarding is already enabled."
+else
+    echo "Enabling IP forwarding..."
+
+    # Modify sysctl.conf file to enable IP forwarding
+    echo "net.ipv4.ip_forward = 1" | sudo tee -a /etc/sysctl.conf > /dev/null
+
+    # Reload sysctl settings
+    sudo sysctl -p
+
+    # Modify the current environment to enable IP forwarding
+    echo "1" | sudo tee /proc/sys/net/ipv4/ip_forward > /dev/null
+
+    echo "IP forwarding has been enabled."
+fi
+
+
 # Check and add line "iptables-restore < /etc/iptables.ipv4.nat"
 add_to_rc_local "iptables-restore < $IPTABLES_FILE"
