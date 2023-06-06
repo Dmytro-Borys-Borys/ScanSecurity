@@ -1,6 +1,5 @@
 __pycache__/*
 ignores/*
-images/*
 dnsmasq/dnsmasq.conf
 freeradius/freeradius.db
 freeradius/clients.conf
