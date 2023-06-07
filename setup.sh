@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Lista de subcarpetas
-subfolders=("dnsmasq" "freeradius" "hostapd" "iptables" "nodogsplash" "python" "networking")
+subfolders=("dnsmasq" "freeradius" "hostapd" "iptables" "nodogsplash" "python" "bluetooth" "networking")
 
 # Recorre cada subcarpeta
 for folder in "${subfolders[@]}"; do
