@@ -8,13 +8,13 @@ set_scriptdir "$BASH_SOURCE"
 attempt_to_load "$NETWORK_CONFIG"
 
 # Comprobando si hostapd está instalado
-verify_dependency "hostapd" "sudo apt install hostapd -y"
+verify_dependency "command -v hostapd" "sudo apt install hostapd -y"
 
 # Rellenando la plantilla del archivo de configuración
 process_all_templates
 
 create_symbolic_link "$SCRIPT_DIR/hostapd.conf" "/etc/hostapd/hostapd.conf" "root"
 
-sudo systemctl unmask hostapd
-sudo systemctl enable hostapd
-sudo systemctl start hostapd
+run "sudo systemctl unmask hostapd"
+run "sudo systemctl enable hostapd"
+run "sudo systemctl start hostapd"

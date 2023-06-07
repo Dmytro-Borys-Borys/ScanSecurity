@@ -1,7 +1,44 @@
+get_full_path() {
+  local path="$1"
+  local root_path="$2"
+  local full_path
+
+  # Check if the root path is provided
+  if [[ -n "$root_path" ]]; then
+    # Calculate relative path
+    
+    full_path="${path#$root_path/}"
+    if [[ "$path" == "$root_path" ]]; then
+        full_path="/"
+    else
+        full_path="/$full_path"
+    fi
+  else
+    # Check if the path is ".."
+    if [[ "$path" == ".." ]]; then
+      # Get the parent directory of the current directory
+      full_path="$(cd "$(dirname "$PWD")" && pwd)"
+    else
+      # Check if the path is relative or absolute
+      if [[ "$path" == /* ]]; then
+        # Absolute path
+        full_path="$path"
+      else
+        # Relative path
+        full_path="$(cd "$(dirname "$path")" && pwd)/$(basename "$path")"
+      fi
+    fi
+  fi
+
+  echo "$full_path"
+}
+
 # Carpeta de configuración
 CONFIG_DIR="$(dirname "$(readlink -f "$BASH_SOURCE")")"
+
 # Carpeta raíz del proyecto
-BASE_DIR="$(dirname "$CONFIG_DIR")"
+BASE_DIR="$(get_full_path "$(dirname "$CONFIG_DIR")")"
+
 # Archivo de ajustes de red
 NETWORK_CONFIG="${CONFIG_DIR}/netconfig.txt"
 # Archivo de ajustes de autenticación
@@ -40,13 +77,11 @@ attempt_to_load() {
 
     # Comprueba si el archivo existe
     if [ ! -f "$file" ]; then
-        echo "File not found: $file"
         exit 1 # Termina el script con un código de salida no cero
     fi
 
     # Continúa con el resto del script si el archivo existe
     source "$file"
-    echo "File loaded: $file"
 }
 
 # Crea un enlace simbólico desde una ruta de destino a una ruta de enlace especificada y cambia el propietario.
@@ -63,10 +98,16 @@ create_symbolic_link() {
     delete_if_exists "$link_path"
 
     # Crea un enlace simbólico
-    sudo ln -sv "$target_path" "$link_path"
+    run "sudo ln -s \"$target_path\" \"$link_path\"" "Enlazando: \"$target_path\" -> \"$link_path\""
 
     # Cambia el dueño del enlace
-    sudo chown -v "$owner:$owner" "$link_path"
+    change_owner "$owner:$owner" "$link_path"
+}
+
+change_owner() {
+    local owner="$1"
+    local target_path="$2"
+    run "sudo chown \"$owner\" \"$target_path\"" "Cambiando dueño: \"$owner\" \"$target_path\""
 }
 
 # Elimina un archivo o directorio si existe.
@@ -76,16 +117,16 @@ delete_if_exists() {
     local file="$1"
     if sudo test -d "$file"; then
         # Deleting directory
-        sudo rm -rv "$file"
+        run "sudo rm -r \"$file\"" "Eliminando directorio: $file"
     fi
     if sudo test -e "$file"; then
         # Deleting file
-        sudo rm -v "$file"
+        run "sudo rm \"$file\"" "Eliminando fichero: $file"
     fi
     if sudo test -L "$file" && ! sudo test -e "$file"; then
         # Deleting broken symlink
-        echo "'$file' is a broken symlink"
-        sudo rm -v "$file"
+        # echo "'$file' is a broken symlink"
+        run "sudo rm \"$file\"" "Eliminando enlace roto: $file"
     fi
 }
 
@@ -99,11 +140,10 @@ add_to_rc_local() {
 
     # Comprueba si la línea existe en el archivo
     if grep -qF "$line" "$file"; then
-        echo "Line already exists in $file"
+        return
     else
         # Agrega la línea antes de "exit 0" en el archivo
-        sudo sed -i "/^exit 0/i $line" "$file"
-        echo "Line added to $file"
+        run "sudo sed -i \"/^exit 0/i $line\" \"$file\"" "Añadiendo \"$line\" al fichero $file"
     fi
 }
 
@@ -123,8 +163,7 @@ process_template() {
     delete_if_exists "$output_path"
 
     local processed_template=$(eval "echo \"$template\"") # Evalúa y sustituye las variables en la plantilla
-    echo "$processed_template" >"$output_path"
-    echo "Written '$output_path'"
+    run "--quiet" "echo '$processed_template' > \"$output_path\"" "Procesando plantilla: \"$template_path\""
 }
 
 # Procesa todas las plantillas en el directorio de templates.
@@ -133,8 +172,8 @@ process_all_templates() {
 
     # Comprueba si el directorio existe
     if [ ! -d "$template_dir" ]; then
-        echo "Directorio de plantillas no encontrado: $template_dir"
-        exit 1
+        # echo "Directorio de plantillas no encontrado: $template_dir"
+        exit 0
     fi
 
     # Procesa cada archivo de plantilla
@@ -151,13 +190,11 @@ process_all_templates() {
 #   - install_command: el comando para instalar la dependencia.
 verify_dependency() {
     # Comprueba si el comando está instalado
-    if command -v "$1" >/dev/null 2>&1; then
-        echo "$1 ya está instalado."
-    else
-        echo "$1 no está instalado. Instalando..."
+    #if command -v "$1" >/dev/null 2>&1; then
+    run "--quiet" "$1" "Comprobando disponibilidad: \"$1\""
+    if [ $? -ne 0 ]; then 
         # Realiza la instalación utilizando el comando proporcionado
-        eval "$2"
-        echo "$1 ha sido instalado."
+        run "$2" "Instalando $2"
     fi
 }
 
@@ -170,4 +207,53 @@ run() {
     else
         echo "Spinner file not found or not executable."
     fi
+}
+
+
+
+
+
+
+change_directory() {
+    full_path=$(get_full_path "$(get_full_path "$1")" "$BASE_DIR") #  
+    if run "cd $1" "Cambiando al directorio: $full_path"; then
+        cd $1
+        return 0
+    else 
+        return $?
+    fi
+}
+
+test_execute() {
+    local script="$(get_full_path "$1")"
+    
+    if [[ -x "$script" ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+execute() {
+    local executable="$(get_full_path "$1")"
+
+    echo "$(test_execute "$executable")"
+    
+    if run "--quiet" "file \"$executable\" | grep \"executable\"" "Ejecutando: \"$executable\"" ; then
+        bash "$executable"
+    fi
+}
+
+verify_pip_dependency() {
+    run "--quiet" "pip show $1 -q" "Comprobando disponibilidad: \"$1\""
+    if [ $? -ne 0 ]; then 
+        # Realiza la instalación utilizando el comando proporcionado
+        run "pip install $1" "Instalando $1 con pip"
+    fi
+}
+
+change_mode() {
+    local mode="$1"
+    local target="$2"
+    run "sudo chmod $mode $target" "Cambiando permisos: $target"
 }

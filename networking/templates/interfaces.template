@@ -1,0 +1,4 @@
+auto $AP_INTERFACE
+iface $AP_INTERFACE inet static
+    address $AP_IP
+    netmask $AP_NETMASK

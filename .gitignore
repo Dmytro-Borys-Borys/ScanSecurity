@@ -1,12 +1,14 @@
-__pycache__/*
+python/__pycache__/*
 ignores/*
+libs/*
 dnsmasq/dnsmasq.conf
 freeradius/freeradius.db
 freeradius/clients.conf
 freeradius/sql
 hostapd/hostapd.conf
+networking/interfaces
 nodogsplash/auth.sh
 nodogsplash/nodogsplash.conf
 nodogsplash/*.htm*
-output.txt
-ticket.png
+*/output.txt
+*/ticket.png

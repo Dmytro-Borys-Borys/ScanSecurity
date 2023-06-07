@@ -9,13 +9,13 @@ subfolders=("libs" "dnsmasq" "freeradius" "hostapd" "iptables" "nodogsplash" "py
 
 # Recorre cada subcarpeta
 for folder in "${subfolders[@]}"; do
-  cd "$folder" || continue # Cambia al directorio o continúa con la siguiente subcarpeta si falla
+  change_directory "$folder" || continue # Cambia al directorio o continúa con la siguiente subcarpeta si falla
 
-  # Aplica el comando 'sudo chmod -x setup.sh'
-  run "sudo chmod -x setup.sh" "cambiando permisos de $folder/setup.sh"
+  # Asigna ejecutable
+  change_mode "+x" "setup.sh"
 
   # Ejecuta el archivo 'setup.sh'
-  sudo bash setup.sh
+  execute "setup.sh"
 
-  cd ..  # Regresa al directorio anterior
+  change_directory ".."  # Regresa al directorio anterior
 done

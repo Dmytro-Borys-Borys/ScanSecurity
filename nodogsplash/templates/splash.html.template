@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang=\"e\$s\">
+<html lang=\"es\">
 
 <head>
     <!-- Meta etiquetas requeridas -->
@@ -89,22 +89,22 @@
     <script>
         // Funci&oacute;n para obtener el valor de un par&aacute;metro de URL por nombre
         function getURLParameter(name) {
-            name = name.replace(/[[]/, '\\[').replace(/[\]]/, '\\]');
-            var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+            name = name.replace(/[[]/, \"\\[\").replace(/[\]]/, \"\\]\");
+            var regex = new RegExp(\"[\\?&]\" + name + \"=([^&#]*)\");
             var results = regex.exec(location.search);
-            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+            return results === null ? \"\" : decodeURIComponent(results[1].replace(/\+/g, \" \"));
         }
 
         // Funci&oacute;n para rellenar los campos del formulario con los valores de los par&aacute;metros de URL y simular clic en el bot&oacute;n de env??o
         function preFillForm() {
-            var username = getURLParameter('u');
-            var password = getURLParameter('p');
+            var username = getURLParameter(\"u\");
+            var password = getURLParameter(\"p\");
 
-            document.getElementById('username').value = username;
-            document.getElementById('password').value = password;
+            document.getElementById(\"username\").value = username;
+            document.getElementById(\"password\").value = password;
 
-            if (username !== '' && password !== '') {
-                var submitButton = document.querySelector('button[type=\"submit\"]');
+            if (username !== \"\" && password !== \"\") {
+                var submitButton = document.querySelector(\"button[type=\"submit\"]\");
                 if (submitButton) {
                     submitButton.click();
                 }

@@ -9,16 +9,16 @@ attempt_to_load "$AUTH_CONFIG"
 
 # Habilitando una carpeta para la base de datos
 if [[ ! -d "$RADIUS_DB_FOLDER" ]]; then
-    sudo mkdir -pv "$RADIUS_DB_FOLDER"
-    sudo chmod -v a+w "$RADIUS_DB_FOLDER"
+    run "sudo mkdir -p \"$RADIUS_DB_FOLDER\"" "Creando carpeta: \"$RADIUS_DB_FOLDER\""
+    change_mode "a+w" "$RADIUS_DB_FOLDER"
 fi
 
 # Instalando FreeRADIUS y sqlite3 si hace falta
-verify_dependency "freeradius" "sudo apt install freeradius -y"
-verify_dependency "sqlite3" "sudo apt install sqlite3 -y"
+verify_dependency "command -v freeradius" "sudo apt install freeradius -y"
+verify_dependency "command -v sqlite3" "sudo apt install sqlite3 -y"
 
 # Estableciendo los permisos de la carpeta de la base de datos
-sudo chown -R freerad:freerad "$RADIUS_DB_FOLDER"
+change_owner "freerad:freerad" "$RADIUS_DB_FOLDER"
 
 # schema_file="/etc/freeradius/3.0/mods-config/sql/main/sqlite/schema.sql"
 # # Comprueba si el archivo de la base de datos ya existe
