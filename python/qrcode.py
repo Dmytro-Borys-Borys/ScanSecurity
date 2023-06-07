@@ -68,10 +68,10 @@ def print_qr_code_file(file_path):
     draw = ImageDraw.Draw(imagen_ticket)
 
     # Cargar las fuentes
-    fuente_header3 = ImageFont.truetype("fonts/Roboto-Black.ttf", tamaño_header3)
-    fuente_header4 = ImageFont.truetype("fonts/Roboto-Black.ttf", tamaño_header4)
-    fuente_parrafo = ImageFont.truetype("fonts/Roboto-Regular.ttf", tamaño_parrafo)
-    fuente_negrita = ImageFont.truetype("fonts/Roboto-Black.ttf", tamaño_negrita)
+    fuente_header3 = ImageFont.truetype("../fonts/Roboto-Black.ttf", tamaño_header3)
+    fuente_header4 = ImageFont.truetype("../fonts/Roboto-Black.ttf", tamaño_header4)
+    fuente_parrafo = ImageFont.truetype("../fonts/Roboto-Regular.ttf", tamaño_parrafo)
+    fuente_negrita = ImageFont.truetype("../fonts/Roboto-Black.ttf", tamaño_negrita)
 
     # Escribir los elementos en la imagen del ticket
     # Escribir los elementos en la imagen del ticket
