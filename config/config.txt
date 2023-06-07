@@ -9,7 +9,10 @@ AUTH_CONFIG="${CONFIG_DIR}/authconfig.txt"
 # Archivo de ajustes de la empresa
 BUSINESS_CONFIG="${CONFIG_DIR}/business.txt"
 
+
 # ---- RUTAS -----
+# Spinner
+SPINNER="${BASE_DIR}/libs/Spinner/newspin.sh"
 # Ruta de base datos de FreeRADIUS
 RADIUS_DB_FOLDER="/opt/freeradius"
 RADIUS_DB_FILENAME="freeradius.db"
@@ -155,5 +158,16 @@ verify_dependency() {
         # Realiza la instalación utilizando el comando proporcionado
         eval "$2"
         echo "$1 ha sido instalado."
+    fi
+}
+
+run() {
+    spinner_file="$SPINNER"
+
+    # Check if spinner file exists and is executable
+    if [ -x "$spinner_file" ]; then
+        "$spinner_file" "$@"
+    else
+        echo "Spinner file not found or not executable."
     fi
 }
