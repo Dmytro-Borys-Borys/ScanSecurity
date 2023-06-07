@@ -18,61 +18,63 @@ set_scriptdir "$BASH_SOURCE"
 
 # Cargar la configuración de Bluetooth
 source "$CONFIG_DIR/bluetooth.txt"
+echo "script dir: $SCRIPT_DIR"
 
+# Verificar si el dispositivo está emparejado o si se agotó el tiempo de espera
+while ! bluetoothctl info "$BLUETOOTH_DEVICE" | grep -q "Paired: yes"; do
+    echo "El dispositivo no está emparejado. Intentando emparejar..."
+
+    if [[ -z "$scan_pid" ]]; then
+        # Realizar la configuración necesaria
+        bluetoothctl power on        # Asegurarse de que Bluetooth esté encendido
+        bluetoothctl agent on        # Habilitar el agente para emparejamiento
+        bluetoothctl discoverable on # Configurar el dispositivo para modo de anuncio y buscar dispositivos
+
+        # Ejecutar el comando "bluetoothctl scan on" en segundo plano y capturar su PID
+        bluetoothctl scan on &
+        scan_pid=$!
+    fi
+
+    # Intentar emparejar con el dispositivo
+    echo "Intentando emparejar con $BLUETOOTH_DEVICE"
+    bluetoothctl pair "$BLUETOOTH_DEVICE"
+
+    # Verificar el estado de salida del comando anterior
+    if [ $? -eq 0 ]; then
+        # Emparejamiento exitoso, salir del bucle
+        echo "Emparejamiento exitoso."
+        break
+    fi
+
+    # Esperar un corto período antes del próximo intento
+    sleep 1
+done
+while ! bluetoothctl info "$BLUETOOTH_DEVICE" | grep -q "Connected: yes"; do
+    bluetoothctl connect "$BLUETOOTH_DEVICE"
+done
 while true; do
-    # Verificar si el dispositivo está emparejado o si se agotó el tiempo de espera
-    while ! bluetoothctl info "$BLUETOOTH_DEVICE" | grep -q "Paired: yes"; do
-        echo "El dispositivo no está emparejado. Intentando emparejar..."
-
-        if [[ -z "$scan_pid" ]]; then
-            # Realizar la configuración necesaria
-            bluetoothctl power on  # Asegurarse de que Bluetooth esté encendido
-            bluetoothctl agent on  # Habilitar el agente para emparejamiento
-            bluetoothctl discoverable on  # Configurar el dispositivo para modo de anuncio y buscar dispositivos
-
-            # Ejecutar el comando "bluetoothctl scan on" en segundo plano y capturar su PID
-            bluetoothctl scan on &
-            scan_pid=$!
-        fi
-
-        # Intentar emparejar con el dispositivo
-        echo "Intentando emparejar con $BLUETOOTH_DEVICE"
-        bluetoothctl pair "$BLUETOOTH_DEVICE"
-
-        # Verificar el estado de salida del comando anterior
-        if [ $? -eq 0 ]; then
-            # Emparejamiento exitoso, salir del bucle
-            echo "Emparejamiento exitoso."
-            break
-        fi
-
-        # Esperar un corto período antes del próximo intento
-        sleep 1
-    done
 
     if [[ -n "$scan_pid" ]]; then
-       # Finalizar el proceso de búsqueda
-       kill "$scan_pid"
-       unset scan_pid
+        # Finalizar el proceso de búsqueda
+        kill "$scan_pid"
+        unset scan_pid
 
-       # Confiar y conectar al dispositivo
-       # bluetoothctl trust "$BLUETOOTH_DEVICE"
-       # bluetoothctl connect "$BLUETOOTH_DEVICE"
+        # Confiar y conectar al dispositivo
+        # bluetoothctl trust "$BLUETOOTH_DEVICE"
+        # bluetoothctl connect "$BLUETOOTH_DEVICE"
 
-       # Desactivar el modo de anuncio
-       bluetoothctl discoverable off
+        # Desactivar el modo de anuncio
+        bluetoothctl discoverable off
 
-       # Deshabilitar el agente
-       bluetoothctl agent off
+        # Deshabilitar el agente
+        bluetoothctl agent off
     fi
 
     # Verificar si se encuentra la secuencia de datos específica
-    echo "Escuchando la entrada..."
-    if sudo hcidump --raw | grep -q "$BLUETOOTH_DATA_SEQUENCE"; then
-        bash "${SCRIPT_DIR}/../freeradius/newcred.sh" 1
-    fi
+    echo "Escuchando la entrada $BLUETOOTH_DATA_SEQUENCE ..."
+    timeout "$BLUETOOTH_TIMEOUT" hcidump --raw | grep --line-buffered "$BLUETOOTH_DATA_SEQUENCE" | while read -r event; do echo "$BLUETOOTH_EVENT"; done | tee "$BLUETOOTH_EVENTLOG"
 
     # Esperar $BLUETOOTH_TIMEOUT segundos entre intentos
     echo "Esperando $BLUETOOTH_TIMEOUT segundos..."
-    sleep "$BLUETOOTH_TIMEOUT"
+    #sleep
 done

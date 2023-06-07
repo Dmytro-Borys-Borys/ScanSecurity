@@ -1,3 +1,6 @@
+bluetooth/bluetooth-connection.service
+bluetooth/eventlog.txt
+freeradius/credential-creation.service
 python/__pycache__/*
 ignores/*
 libs/*

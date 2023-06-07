@@ -16,6 +16,7 @@ fi
 # Instalando FreeRADIUS y sqlite3 si hace falta
 verify_dependency "command -v freeradius" "sudo apt install freeradius -y"
 verify_dependency "command -v sqlite3" "sudo apt install sqlite3 -y"
+verify_dependendy "commpand -v pwgen" "sudo apt install pwgen -y"
 
 # Estableciendo los permisos de la carpeta de la base de datos
 change_owner "freerad:freerad" "$RADIUS_DB_FOLDER"
@@ -50,4 +51,7 @@ create_symbolic_link "$SCRIPT_DIR/default" "/etc/freeradius/3.0/sites-enabled/de
 run "sudo systemctl stop freeradius" "Parando FreeRADIUS"
 delete_if_exists "$RADIUS_DB"
 run "sudo systemctl start freeradius" "Iniciando FreeRADIUS"
+
+change_mode "+x" "$SCRIPT_DIR/newcred.sh"
+install_service "$SCRIPT_DIR/credential-creation.service" "/etc/systemd/system/credential-creation.service"
 

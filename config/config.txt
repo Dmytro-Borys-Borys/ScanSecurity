@@ -50,6 +50,8 @@ BUSINESS_CONFIG="${CONFIG_DIR}/business.txt"
 # ---- RUTAS -----
 # Spinner
 SPINNER="${BASE_DIR}/libs/Spinner/newspin.sh"
+# Bluetooth watcher
+BLUETOOTH_EVENTLOG="$(get_full_path "${BASE_DIR}/bluetooth/eventlog.txt")"
 # Ruta de base datos de FreeRADIUS
 RADIUS_DB_FOLDER="/opt/freeradius"
 RADIUS_DB_FILENAME="freeradius.db"
@@ -57,6 +59,8 @@ RADIUS_DB=${RADIUS_DB_FOLDER}/${RADIUS_DB_FILENAME}
 # Nombre de la página web NoDogSplash
 NDS_PAGE="splash.html"
 # Nombre del logotipo NoDogSplash (dentro de la carpeta /images)
+
+BLUETOOTH_EVENT="Click!"
 
 
 # ===== FUNCIONES =====
@@ -261,4 +265,19 @@ change_mode() {
     local mode="$1"
     local target="$2"
     run "sudo chmod $mode $target" "Cambiando permisos: $target"
+}
+
+install_service() {
+    local service_template="$1"
+    local service_file="$2"
+    local service_name=$(basename "$service_file")
+    create_symbolic_link "$service_template" "$service_file" "root"
+    change_mode "644" "$service_file"
+
+    # Reload systemd configuration
+    run "sudo systemctl daemon-reload"
+
+    # Enable and start the service
+    run "sudo systemctl enable $service_name"
+    run "sudo systemctl start $service_name"
 }
