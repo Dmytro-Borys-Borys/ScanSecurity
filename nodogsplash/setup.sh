@@ -8,7 +8,7 @@ set_scriptdir "$BASH_SOURCE"
 attempt_to_load "$AUTH_CONFIG"
 attempt_to_load "$BUSINESS_CONFIG"
 
-#verify_dependency "command -v nodogsplash" "sudo bash $SCRIPT_DIR/getnodogsplash.sh"
+verify_dependency "command -v nodogsplash" "sudo bash $SCRIPT_DIR/getnodogsplash.sh"
 
 # Cargando settings de red
 attempt_to_load "$NETWORK_CONFIG"

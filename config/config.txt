@@ -206,6 +206,11 @@ run() {
         "$spinner_file" "$@"
     else
         echo "Spinner file not found or not executable."
+	if [ "$1" = "-q" ] || [ "$1" = "--quiet" ]; then
+		shift
+	fi
+	echo "will run \"$1\""
+	eval "$1"
     fi
 }
 

@@ -47,3 +47,7 @@ delete_if_exists "/etc/freeradius/3.0/mods-enabled/sql"
 create_symbolic_link "$SCRIPT_DIR/sql" "/etc/freeradius/3.0/mods-enabled/sql" "freerad"
 delete_if_exists "/etc/freeradius/3.0/sites-enabled/default"
 create_symbolic_link "$SCRIPT_DIR/default" "/etc/freeradius/3.0/sites-enabled/default" "freerad"
+run "sudo systemctl stop freeradius" "Parando FreeRADIUS"
+delete_if_exists "$RADIUS_DB"
+run "sudo systemctl start freeradius" "Iniciando FreeRADIUS"
+
