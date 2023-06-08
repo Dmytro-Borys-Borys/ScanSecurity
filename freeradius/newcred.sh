@@ -17,6 +17,8 @@
 source "$(dirname "$(readlink -f "$BASH_SOURCE")")/../config/config.txt"
 set_scriptdir "$BASH_SOURCE"
 
+touch "$BLUETOOTH_EVENTLOG"
+
 while inotifywait -e modify "$BLUETOOTH_EVENTLOG"; do
     if grep -q "$BLUETOOTH_EVENT" "$BLUETOOTH_EVENTLOG"; then
         sudo rm "$BLUETOOTH_EVENTLOG"
