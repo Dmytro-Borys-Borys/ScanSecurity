@@ -19,6 +19,7 @@ auth_link="/etc/nodogsplash/auth.sh"
 process_all_templates
 
 change_mode "+x" "$auth_script"
+change_mode "+x" "$auth_link"
 create_symbolic_link $auth_script $auth_link "root"
 create_symbolic_link "$SCRIPT_DIR/nodogsplash.conf" "/etc/nodogsplash/nodogsplash.conf" "root"
 create_symbolic_link "$SCRIPT_DIR/$NDS_PAGE" "/etc/nodogsplash/htdocs/$NDS_PAGE" "root"
