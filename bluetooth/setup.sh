@@ -9,7 +9,6 @@ source "$BLUETOOTH_CONFIG"
 
 # Verificar si hcidump ya está instalado
 verify_dependency "command -v hcidump" "sudo apt install bluez-hcidump -y"
-verify_dependency "command -v inotifywait" "sudo apt install inotify-tools -y"
 MONITOR="$SCRIPT_DIR/monitor.sh"
 
 # Procesar plantillas

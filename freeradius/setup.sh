@@ -17,6 +17,7 @@ fi
 verify_dependency "command -v freeradius" "sudo apt install freeradius -y"
 verify_dependency "command -v sqlite3" "sudo apt install sqlite3 -y"
 verify_dependency "command -v pwgen" "sudo apt install pwgen -y"
+verify_dependency "command -v inotifywait" "sudo apt install inotify-tools -y"
 
 # Estableciendo los permisos de la carpeta de la base de datos
 change_owner "freerad:freerad" "$RADIUS_DB_FOLDER"
