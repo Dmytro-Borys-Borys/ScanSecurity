@@ -184,7 +184,7 @@ verify_dependency() {
     local install_command="$2"
 
     # Comprueba si el comando está instalado
-    run "--quiet" "command -v $command_name" "Comprobando disponibilidad: \"$command_name\""
+    run "--quiet" "$command_name" "Comprobando disponibilidad: \"$command_name\""
 
     if [ $? -ne 0 ]; then
         # Realiza la instalación utilizando el comando proporcionado
