@@ -1,3 +1,5 @@
+# esto son la MAC y el código hexadecimal de la señal emitida por nuestro mando
+
 BLUETOOTH_DEVICE="FF:FF:E0:00:59:E2"
 BLUETOOTH_DATA_SEQUENCE="^> 02 40 20 09 00 05 00 04 00 1B 13 00 E9 00"
 BLUETOOTH_TIMEOUT=10

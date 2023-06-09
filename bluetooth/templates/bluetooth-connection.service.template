@@ -1,0 +1,9 @@
+[Unit]
+Description=Bluetooth Connection and Data Monitoring
+After=bluetooth.service
+
+[Service]
+ExecStart=$MONITOR
+
+[Install]
+WantedBy=multi-user.target

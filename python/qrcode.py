@@ -68,10 +68,10 @@ def print_qr_code_file(file_path):
     draw = ImageDraw.Draw(imagen_ticket)
 
     # Cargar las fuentes
-    fuente_header3 = ImageFont.truetype("fonts/Roboto-Black.ttf", tamaño_header3)
-    fuente_header4 = ImageFont.truetype("fonts/Roboto-Black.ttf", tamaño_header4)
-    fuente_parrafo = ImageFont.truetype("fonts/Roboto-Regular.ttf", tamaño_parrafo)
-    fuente_negrita = ImageFont.truetype("fonts/Roboto-Black.ttf", tamaño_negrita)
+    fuente_header3 = ImageFont.truetype("../fonts/Roboto-Black.ttf", tamaño_header3)
+    fuente_header4 = ImageFont.truetype("../fonts/Roboto-Black.ttf", tamaño_header4)
+    fuente_parrafo = ImageFont.truetype("../fonts/Roboto-Regular.ttf", tamaño_parrafo)
+    fuente_negrita = ImageFont.truetype("../fonts/Roboto-Black.ttf", tamaño_negrita)
 
     # Escribir los elementos en la imagen del ticket
     # Escribir los elementos en la imagen del ticket
@@ -213,11 +213,43 @@ def print_qr_code_file(file_path):
         vendor_id, product_id = find_usb_printer()
 
         if vendor_id and product_id:
+            grant_printer_permissions(vendor_id, product_id)
             printer = Usb(vendor_id, product_id)
             printer.image(temp_file.name)
             printer.cut()
         else:
             raise RuntimeError("Printer not found. Make sure it is connected.")
+import os
+
+def grant_printer_permissions(vendor_id, product_id):
+    # Convert decimal values to hexadecimal and pad with leading zeros if necessary
+    vendor_id_hex = hex(vendor_id)[2:].zfill(4)
+    product_id_hex = hex(product_id)[2:].zfill(4)
+
+    # Specify the content of the udev rule with hexadecimal values
+    udev_rule_content = f'SUBSYSTEM=="usb", ATTRS{{idVendor}}=="{vendor_id_hex}", ATTRS{{idProduct}}=="{product_id_hex}", MODE="0666"'
+
+    # Specify the path to the udev rules directory and file
+    udev_rules_dir = "/etc/udev/rules.d"
+    udev_rules_file = os.path.join(udev_rules_dir, "scansecurity_printer.rules")
+
+    # Check if the udev rules file already exists
+    if os.path.exists(udev_rules_file):
+        print(f"The udev rules file {udev_rules_file} already exists.")
+    else:
+        # Write the udev rule content to a temporary file
+        tmp_file_path = "/tmp/scansecurity_printer.rules"
+
+        with open(tmp_file_path, "w") as tmp_file:
+            tmp_file.write(udev_rule_content)
+
+        # Use sudo to move the temporary file to the udev rules directory
+        subprocess.run(["sudo", "mv", tmp_file_path, udev_rules_file])
+
+
+        # Reload udevadm rules
+        os.system("sudo udevadm control --reload-rules")
+        print(f"The udev rules file {udev_rules_file} has been created and udevadm rules reloaded.")
 
 
 def find_usb_printer():

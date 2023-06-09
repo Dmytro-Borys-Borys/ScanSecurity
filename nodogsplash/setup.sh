@@ -1,33 +1,14 @@
 #!/bin/bash
 
 # Cargando settings generales
-source "../config/config.txt"
+source "$(dirname "$(readlink -f "$BASH_SOURCE")")/../config/config.txt"
 set_scriptdir "$BASH_SOURCE"
+
 # Cargando settings de red
 attempt_to_load "$AUTH_CONFIG"
 attempt_to_load "$BUSINESS_CONFIG"
 
-# Comprobar si nodogsplash se encuentra instalado
-if command -v nodogsplash &>/dev/null; then
-  echo "nodogsplash is installed"
-else
-  echo "nodogsplash is not installed"
-  # Instalando requisitos previos nodogsplash
-  sudo apt update
-  sudo apt install build-essential debhelper devscripts git libmicrohttpd-dev -y
-
-  nds_dir="$BASE_DIR/ignores/nodogsplash"
-
-  delete_if_exists $nds_dir
-
-  # Instalando nodogsplash desde git
-  git clone https://github.com/nodogsplash/nodogsplash.git $nds_dir
-  cd $nds_dir
-  make
-  sudo make install
-
-  delete_if_exists $nds_dir
-fi
+verify_dependency "command -v nodogsplash" "sudo bash $SCRIPT_DIR/getnodogsplash.sh"
 
 # Cargando settings de red
 attempt_to_load "$NETWORK_CONFIG"
@@ -37,10 +18,9 @@ auth_link="/etc/nodogsplash/auth.sh"
 
 process_all_templates
 
-
-
-chmod +x "$auth_script"
 create_symbolic_link $auth_script $auth_link "root"
+change_mode "+x" "$auth_script"
+change_mode "+x" "$auth_link"
 create_symbolic_link "$SCRIPT_DIR/nodogsplash.conf" "/etc/nodogsplash/nodogsplash.conf" "root"
 create_symbolic_link "$SCRIPT_DIR/$NDS_PAGE" "/etc/nodogsplash/htdocs/$NDS_PAGE" "root"
 create_symbolic_link "$SCRIPT_DIR/bootstrap.min.css" "/etc/nodogsplash/htdocs/bootstrap.min.css" "root"

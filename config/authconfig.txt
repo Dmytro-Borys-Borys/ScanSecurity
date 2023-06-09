@@ -1,0 +1,2 @@
+# Contraseña de acceso a FreeRADIUS
+SHARED_SECRET=\$ecurity\$can

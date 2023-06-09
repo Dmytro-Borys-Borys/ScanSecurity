@@ -6,37 +6,6 @@ sql {
 		busy_timeout = 200
 		bootstrap = \"\${modconfdir}/\${..:name}/main/sqlite/schema.sql\"
 	}
-
-
-	mysql {
-		tls {
-			ca_file = \"/etc/ssl/certs/my_ca.crt\"
-			ca_path = \"/etc/ssl/certs/\"
-			certificate_file = \"/etc/ssl/certs/private/client.crt\"
-			private_key_file = \"/etc/ssl/certs/private/client.key\"
-			cipher = \"DHE-RSA-AES256-SHA:AES128-SHA\"
-			tls_required = yes
-			tls_check_cert = no
-			tls_check_cert_cn = no
-		}
-		warnings = auto
-	}
-	postgresql {
-		send_application_name = yes
-	}
-	mongo {
-		appname = \"freeradius\"
-		tls {
-			certificate_file = /path/to/file
-			certificate_password = \"password\"
-			ca_file = /path/to/file
-			ca_dir = /path/to/directory
-			crl_file = /path/to/file
-			weak_cert_validation = false
-			allow_invalid_hostname = false
-		}
-	}
-
 	radius_db = \"radius\"
 	acct_table1 = \"radacct\"
 	acct_table2 = \"radacct\"

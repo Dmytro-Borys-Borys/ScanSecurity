@@ -4,10 +4,7 @@ sudo apt install python3-pip
 # Instalamos pybluez  - no hizo falta porque va mal
 pip install pybluez
 
-#instalamos pyrad
-pip install pyrad
 
-#"/var/lib/freeradius/freeradius.db"
 
 # robo aquí https://github.com/zozs/wifi-user-mgmt/blob/master/wifi.sh
 
@@ -26,7 +23,7 @@ sudo udevadm control --reload-rules
 # git
 apt install git
 
-# controladora de la impresora https://github.com/klirichek/zj-58
+# controladora de la impresora https://github.com/klirichek/zj-58 - no hace falta con este modelo
 sudo apt install build-essential cmake libcups2-dev libcupsimage2-dev
 https://github.com/klirichek/zj-58.git
 git clone https://github.com/klirichek/zj-58.git printerdriver/source
@@ -37,7 +34,7 @@ cd printerdriver
   sudo make install
 
 
-#Install the necessary packages and dependencies:
+#Install the necessary packages and dependencies: - tampoco hace falta
 sudo apt update
 sudo apt install cups printer-driver-all
 
