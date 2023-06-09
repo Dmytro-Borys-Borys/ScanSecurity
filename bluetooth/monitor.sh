@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ##########################################################
-# Script de Conexión Bluetooth y Ejecución de Subscriptos #
+# Script de Conexión Bluetooth y Ejecución de Subscripts #
 ##########################################################
 
 # Descripción del archivo:
@@ -13,22 +13,25 @@
 #   repite el proceso.
 
 # Cargando settings generales
-source "$(dirname "$(readlink -f "$BASH_SOURCE")")/../config/config.txt"
-set_scriptdir "$BASH_SOURCE"
+source "$(dirname "$(readlink -f "$BASH_SOURCE")")/../config/config.env"
+SCRIPT_DIR="$(set_scriptdir "$BASH_SOURCE")"
 
 # Cargar la configuración de Bluetooth
-source "$CONFIG_DIR/bluetooth.txt"
-echo "script dir: $SCRIPT_DIR"
+source "$BLUETOOTH_CONFIG"
+
+# Realizar la configuración necesaria
+bluetoothctl power on        # Asegurarse de que Bluetooth esté encendido
+bluetoothctl agent on        # Habilitar el agente para emparejamiento
 
 # Verificar si el dispositivo está emparejado o si se agotó el tiempo de espera
 while ! bluetoothctl info "$BLUETOOTH_DEVICE" | grep -q "Paired: yes"; do
     echo "El dispositivo no está emparejado. Intentando emparejar..."
+    # Confiando en el dispositivo
+    bluetoothctl trust "$BLUETOOTH_DEVICE"
 
     if [[ -z "$scan_pid" ]]; then
-        # Realizar la configuración necesaria
-        bluetoothctl power on        # Asegurarse de que Bluetooth esté encendido
-        bluetoothctl agent on        # Habilitar el agente para emparejamiento
-        bluetoothctl discoverable on # Configurar el dispositivo para modo de anuncio y buscar dispositivos
+
+        # bluetoothctl discoverable on # Configurar el dispositivo para modo de anuncio y buscar dispositivos
 
         # Ejecutar el comando "bluetoothctl scan on" en segundo plano y capturar su PID
         bluetoothctl scan on &
@@ -60,7 +63,7 @@ while true; do
         unset scan_pid
 
         # Confiar y conectar al dispositivo
-        # bluetoothctl trust "$BLUETOOTH_DEVICE"
+        # 
         # bluetoothctl connect "$BLUETOOTH_DEVICE"
 
         # Desactivar el modo de anuncio

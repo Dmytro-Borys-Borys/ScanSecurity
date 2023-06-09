@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Cargando settings generales
-source "$(dirname "$(readlink -f "$BASH_SOURCE")")/../config/config.txt"
-set_scriptdir "$BASH_SOURCE"
+source "$(dirname "$(readlink -f "$BASH_SOURCE")")/../config/config.env"
+SCRIPT_DIR="$(set_scriptdir "$BASH_SOURCE")"
 
 # Cargando settings de red
 attempt_to_load "$AUTH_CONFIG"

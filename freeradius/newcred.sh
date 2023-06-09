@@ -14,8 +14,8 @@
 #   del usuario en la base de datos.
 
 # Cargando settings generales
-source "$(dirname "$(readlink -f "$BASH_SOURCE")")/../config/config.txt"
-set_scriptdir "$BASH_SOURCE"
+source "$(dirname "$(readlink -f "$BASH_SOURCE")")/../config/config.env"
+SCRIPT_DIR="$(set_scriptdir "$BASH_SOURCE")"
 
 touch "$BLUETOOTH_EVENTLOG"
 
@@ -62,8 +62,6 @@ while inotifywait -e modify "$BLUETOOTH_EVENTLOG"; do
         else
             expiration=""
         fi
-
-        echo "$login $password $hash $expiration" >> /tmp/newcred.txt
 
         # Insertar el usuario en la base de datos.
         sqlite_sql "INSERT INTO radcheck (username,attribute,op,value) VALUES ('$login','NT-Password',':=','$hash');"
