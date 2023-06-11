@@ -9,7 +9,8 @@ subfolders=("libs" "dnsmasq" "freeradius" "hostapd" "iptables" "nodogsplash" "py
 
 # Recorre cada subcarpeta
 for folder in "${subfolders[@]}"; do
-  change_directory "$SCRIPT_DIR/$folder" || continue # Cambia al directorio o continúa con la siguiente subcarpeta si falla
+  # Cambia al directorio o continúa con la siguiente subcarpeta si falla
+  change_directory "$SCRIPT_DIR/$folder" || continue 
 
   # Asigna ejecutable
   change_mode "+x" "setup.sh"
