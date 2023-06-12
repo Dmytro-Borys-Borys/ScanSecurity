@@ -20,7 +20,7 @@ process_all_templates
 # Creando enlaces
 create_symbolic_link $auth_script $auth_link "root"
 change_mode "+x" "$auth_script"
-# change_mode "+x" "$auth_link"
+change_mode "+x" "$auth_link"
 create_symbolic_link "$SCRIPT_DIR/nodogsplash.conf" "/etc/nodogsplash/nodogsplash.conf" "root"
 create_symbolic_link "$SCRIPT_DIR/$NDS_PAGE" "/etc/nodogsplash/htdocs/$NDS_PAGE" "root"
 create_symbolic_link "$SCRIPT_DIR/bootstrap.min.css" "/etc/nodogsplash/htdocs/bootstrap.min.css" "root"

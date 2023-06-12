@@ -1,10 +1,7 @@
-# Servicio que se encargará de procesar la conexión Bluetooth y vigilará las transmisiones.
 [Unit]
 Description=Bluetooth Connection and Data Monitoring
-# Se iniciará después de que el servicio de bluetooth esté operativo
 After=bluetooth.service
 
-# Ruta al archivo ejecutable (en este caso un script)
 [Service]
 ExecStart=$MONITOR
 

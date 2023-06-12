@@ -1,20 +1,7 @@
-# Establece la interfaz de red en la que dnsmasq debe escuchar y responder a las solicitudes DNS y DHCP.
-interface=${AP_INTERFACE}                       
-
-# Evita la respuesta a las solicitudes DNS sin un dominio especificado. Solo responde a las solicitudes con un dominio válido.
+interface=${AP_INTERFACE}
 domain-needed
-
-# Bloquea las respuestas a las direcciones IP privadas que no deberían ser accesibles desde Internet público.
 bogus-priv
-
-# Obliga a dnsmasq a escuchar solo en las interfaces de red especificadas.
 bind-interfaces
-
-# Define el rango de direcciones IP que dnsmasq debe asignar a través del protocolo DHCP. 
 dhcp-range=${AP_DHCP_RANGE},${AP_NETMASK},12h
-
-# Configura la opción 3 (puerta de enlace predeterminada) en las respuestas DHCP.
 dhcp-option=3,${AP_IP}
-
-# Configura la opción 6 (servidores DNS) en las respuestas DHCP.
 dhcp-option=6,${WAN_DNS}

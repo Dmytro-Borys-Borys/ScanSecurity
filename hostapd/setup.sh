@@ -13,10 +13,8 @@ verify_dependency "command -v hostapd" "sudo apt install hostapd -y"
 # Rellenando la plantilla del archivo de configuración
 process_all_templates
 
-# Creando enlace simbólico
 create_symbolic_link "$SCRIPT_DIR/hostapd.conf" "/etc/hostapd/hostapd.conf" "root"
 
-# Ajustando opciones de inicio del servicio
 run "sudo systemctl unmask hostapd"
 run "sudo systemctl enable hostapd"
 run "sudo systemctl start hostapd"
