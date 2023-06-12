@@ -23,18 +23,18 @@ run "sudo sh -c \"iptables-save > $IPTABLES_FILE\"" "Guardando las reglas iptabl
 
 ip_forward_value=$(sysctl -n net.ipv4.ip_forward)
 if [[ "$ip_forward_value" -eq 0 ]]; then
-    # echo "Enabling IP forwarding..."
+    # Habilitando IP forwarding
 
-    # Modify sysctl.conf file to enable IP forwarding
+    # Modificando sysctl.conf para habilitar IP forwarding
     run "--quiet" "echo \"net.ipv4.ip_forward = 1\" | sudo tee -a /etc/sysctl.conf" "Editando fichero: /etc/sysctlconf"
 
-    # Reload sysctl settings
-    run "sudo sysctl -p" "Recargando: sysctl"
-
-    # Modify the current environment to enable IP forwarding
+    # Modificando el entorno actual para habilitar IP forwarding sin reiniciar
     run "--quiet" "echo \"1\" | sudo tee /proc/sys/net/ipv4/ip_forward" "Asignando ip_forward=1 al entorno actual"
+
+    # Recargando sysctl
+    run "sudo sysctl -p" "Recargando: sysctl"
 fi
 
 
-# Check and add line "iptables-restore < /etc/iptables.ipv4.nat"
+# Nos aseguramos de restaurar las reglas de iptables del archivo $IPTABLES_FILE
 add_to_rc_local "iptables-restore < $IPTABLES_FILE"

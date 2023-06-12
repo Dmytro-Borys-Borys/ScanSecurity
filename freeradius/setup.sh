@@ -42,17 +42,25 @@ change_owner "freerad:freerad" "$RADIUS_DB_FOLDER"
 # 	fi
 # fi
 
+# Procesando todas las plantillas
 process_all_templates
+
+# Estableciendo enlaces simbólicos
 delete_if_exists "/etc/freeradius/3.0/clients.conf"
 create_symbolic_link "$SCRIPT_DIR/clients.conf" "/etc/freeradius/3.0/clients.conf" "freerad"
 delete_if_exists "/etc/freeradius/3.0/mods-enabled/sql"
 create_symbolic_link "$SCRIPT_DIR/sql" "/etc/freeradius/3.0/mods-enabled/sql" "freerad"
 delete_if_exists "/etc/freeradius/3.0/sites-enabled/default"
 create_symbolic_link "$SCRIPT_DIR/default" "/etc/freeradius/3.0/sites-enabled/default" "freerad"
-run "sudo systemctl stop freeradius" "Parando FreeRADIUS"
-delete_if_exists "$RADIUS_DB"
-run "sudo systemctl start freeradius" "Iniciando FreeRADIUS"
 
+# Reseteando la base de datos de FreeRADIUS si se ha inicializado mal:
+if [ ! -s "$RADIUS_DB" ]; then
+    run "sudo systemctl stop freeradius" "Parando FreeRADIUS"
+    delete_if_exists "$RADIUS_DB"
+    run "sudo systemctl start freeradius" "Iniciando FreeRADIUS"
+fi
+
+# Creando servicio
 change_mode "+x" "$SCRIPT_DIR/newcred.sh"
 install_service "$SCRIPT_DIR/credential-creation.service" "/etc/systemd/system/credential-creation.service"
 
