@@ -16,7 +16,11 @@ run "sudo iptables -v -F; \
     sudo iptables -v -t mangle -X; \
     sudo iptables -v -A FORWARD -i $GW_INTERFACE -o $AP_INTERFACE -m state --state RELATED,ESTABLISHED -j ACCEPT; \
     sudo iptables -v -A FORWARD -i $AP_INTERFACE -o $GW_INTERFACE -j ACCEPT; \
-    sudo iptables -v -t nat -A POSTROUTING -o $GW_INTERFACE -j MASQUERADE" "Ajustando iptables"
+    sudo iptables -v -t nat -A POSTROUTING -o $GW_INTERFACE -j MASQUERADE; \
+    sudo iptables -v -P INPUT DROP; \
+    sudo iptables -v -P FORWARD DROP; \
+    sudo iptables -v -P OUTPUT DROP" "Ajustando iptables"
+
 
 # Guardar las reglas de iptables en un archivo
 run "sudo sh -c \"iptables-save > $IPTABLES_FILE\"" "Guardando las reglas iptables en $IPTABLES_FILE"
