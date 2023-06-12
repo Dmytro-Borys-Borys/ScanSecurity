@@ -14,12 +14,22 @@ run "sudo iptables -v -F; \
     sudo iptables -v -t nat -X; \
     sudo iptables -v -t mangle -F; \
     sudo iptables -v -t mangle -X; \
+    sudo iptables -v -P INPUT DROP; \
+    sudo iptables -v -P FORWARD DROP; \
+    sudo iptables -v -P OUTPUT DROP; \
     sudo iptables -v -A FORWARD -i $GW_INTERFACE -o $AP_INTERFACE -m state --state RELATED,ESTABLISHED -j ACCEPT; \
     sudo iptables -v -A FORWARD -i $AP_INTERFACE -o $GW_INTERFACE -j ACCEPT; \
     sudo iptables -v -t nat -A POSTROUTING -o $GW_INTERFACE -j MASQUERADE; \
-    sudo iptables -v -P INPUT DROP; \
-    sudo iptables -v -P FORWARD DROP; \
-    sudo iptables -v -P OUTPUT DROP" "Ajustando iptables"
+    sudo iptables -v -A INPUT -i $GW_INTERFACE -p icmp -j ACCEPT; \
+    sudo iptables -v -A OUTPUT -o $GW_INTERFACE -p icmp -m state --state RELATED,ESTABLISHED -j ACCEPT; \
+    sudo iptables -v -A INPUT -i $GW_INTERFACE -p tcp -m state --state NEW,RELATED,ESTABLISHED -j ACCEPT; \
+    sudo iptables -v -A INPUT -i $GW_INTERFACE -p udp -m state --state NEW,RELATED,ESTABLISHED -j ACCEPT; \
+    sudo iptables -v -A OUTPUT -o $GW_INTERFACE -p tcp -m state --state NEW,RELATED,ESTABLISHED -j ACCEPT; \
+    sudo iptables -v -A OUTPUT -o $GW_INTERFACE -p udp -m state --state NEW,RELATED,ESTABLISHED -j ACCEPT; \
+    sudo iptables -v -A INPUT -i lo -p udp -j ACCEPT; \
+    sudo iptables -v -A INPUT -i lo -p tcp -j ACCEPT; \
+    sudo iptables -v -A OUTPUT -o lo -p udp -j ACCEPT; \
+    sudo iptables -v -A OUTPUT -o lo -p tcp -j ACCEPT" "Ajustando iptables"
 
 
 # Guardar las reglas de iptables en un archivo
