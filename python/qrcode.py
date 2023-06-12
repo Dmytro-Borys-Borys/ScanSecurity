@@ -1,4 +1,5 @@
 import qrcode
+import os
 import pyqrcode
 import argparse
 import subprocess
@@ -11,38 +12,39 @@ from escpos.printer import Usb
 def resize_image(image, width, height):
     original_width, original_height = image.size
 
-    # Calculate the new dimensions while maintaining the aspect ratio
+    # Calcular las nuevas dimensiones manteniendo la relación de aspecto
     width_ratio = width / original_width
     height_ratio = height / original_height
 
-    # Use the smaller scaling factor to ensure the image fits within the desired dimensions
+    # Utilizar el factor de escala más pequeño para asegurar que la imagen quepa dentro de las dimensiones deseadas
     scaling_factor = min(width_ratio, height_ratio)
 
-    # Calculate the new dimensions based on the scaling factor
+    # Calcular las nuevas dimensiones basadas en el factor de escala
     new_width = int(original_width * scaling_factor)
     new_height = int(original_height * scaling_factor)
 
-    # Resize the image using the new dimensions
+    # Redimensionar la imagen utilizando las nuevas dimensiones
     resized_image = image.resize((new_width, new_height))
 
     return resized_image
 
 
 def generate_wifi_qrcode():
-    # Create the WiFi network URI
+    # Crear la URI de la red WiFi
     wifi_uri = f"http://{args.ap_host}:2050/?u={args.username}&p={args.password}"
     print(wifi_uri)
 
-    # Generate the QR code
+    # Generar el código QR
     qr_code = pyqrcode.create(wifi_uri)
 
-    # Save the QR code as a PNG file
+    # Guardar el código QR como un archivo PNG
     with tempfile.NamedTemporaryFile(suffix=".png") as temp_file:
         qr_code.png(temp_file.name, scale=5)
         temp_file.seek(0)
 
-        # Print the QR code using the USB printer
+        # Imprimir el código QR utilizando la impresora USB
         print_qr_code_file(temp_file.name)
+
 
 
 def print_qr_code_file(file_path):
@@ -50,7 +52,7 @@ def print_qr_code_file(file_path):
     alto_maximo = 750
 
     # Definir el contenido del ticket
-    sistema_wifi = "Sistema de Acceso WiFi"
+    sistema_wifi = "Sistema de Acceso Wi-Fi"
     usuario = "Usuario: "
     contrasena = "Password: "
     valido_hasta = "Válido hasta: "
@@ -73,7 +75,6 @@ def print_qr_code_file(file_path):
     fuente_parrafo = ImageFont.truetype("../fonts/Roboto-Regular.ttf", tamaño_parrafo)
     fuente_negrita = ImageFont.truetype("../fonts/Roboto-Black.ttf", tamaño_negrita)
 
-    # Escribir los elementos en la imagen del ticket
     # Escribir los elementos en la imagen del ticket
     draw.text(
         (
@@ -115,29 +116,23 @@ def print_qr_code_file(file_path):
     # Cargar y ajustar la imagen del logo
     imagen_texto = Image.open(args.business_text)
     imagen_texto = resize_image(imagen_texto, 550, 80)
-
     imagen_ticket.paste(imagen_texto, ((ancho_maximo - imagen_texto.width) // 2, 180))
 
-    # Load and position the QR code image
+    # Cargar y posicionar la imagen del código QR
     qr_code_img = Image.open(file_path)
-    qr_code_img = qr_code_img.resize((285, 285))  # Resize to 285x285 pixels
+    qr_code_img = qr_code_img.resize((285, 285))  # Redimensionar a 285x285 píxeles
 
-    # Calculate the center position of the QR code image on the canvas
+    # Calcular la posición central de la imagen del código QR en el lienzo
     qr_code_x = (ancho_maximo - qr_code_img.width) // 2
     qr_code_y = 250
-
     qr_code_position = (qr_code_x, qr_code_y)
     imagen_ticket.paste(qr_code_img, qr_code_position)
 
-    # Load the additional image
+    # Cargar y ajustar la imagen adicional
     additional_img = Image.open(args.business_logo)
-
-    # Calculate the dimensions of the additional image
-    additional_width, additional_height = additional_img.size
-
     additional_img = resize_image(additional_img, 80, 80)
 
-    # Calculate the position to paste the additional image
+    # Calcular la posición para pegar la imagen adicional
     additional_position_x = (
         qr_code_x + qr_code_img.width // 2 - additional_img.width // 2
     )
@@ -145,14 +140,14 @@ def print_qr_code_file(file_path):
         qr_code_y + qr_code_img.height // 2 - additional_img.height // 2
     )
 
-    # Paste the additional image onto the canvas
+    # Pegar la imagen adicional en el lienzo
     imagen_ticket.paste(
         additional_img,
         (additional_position_x, additional_position_y),
         mask=additional_img,
     )
 
-    # Calculate the total width of key and value texts
+    # Calcular el ancho total de los textos de clave y valor
     key_width = max(
         draw.textlength(usuario, font=fuente_negrita),
         draw.textlength(contrasena, font=fuente_negrita),
@@ -164,14 +159,14 @@ def print_qr_code_file(file_path):
         draw.textlength(args.password_expiry, font=fuente_parrafo),
     )
 
-    # Calculate the center position
+    # Calcular la posición central
     center_position = ancho_maximo // 2
 
-    # Calculate the positions for key and value texts
+    # Calcular las posiciones para los textos de clave y valor
     key_position = center_position - key_width - 10
     value_position = center_position + 10
 
-    # Place the key and value texts
+    # Colocar los textos de clave y valor
     draw.text((key_position, 543), usuario, font=fuente_negrita, fill="black")
     draw.text((value_position, 543), args.username, font=fuente_parrafo, fill="black")
 
@@ -219,74 +214,74 @@ def print_qr_code_file(file_path):
             printer.cut()
         else:
             raise RuntimeError("Printer not found. Make sure it is connected.")
-import os
+
 
 def grant_printer_permissions(vendor_id, product_id):
-    # Convert decimal values to hexadecimal and pad with leading zeros if necessary
+    # Convertir los valores decimales a hexadecimal y completar con ceros iniciales si es necesario
     vendor_id_hex = hex(vendor_id)[2:].zfill(4)
     product_id_hex = hex(product_id)[2:].zfill(4)
 
-    # Specify the content of the udev rule with hexadecimal values
+    # Especificar el contenido de la regla udev con valores hexadecimales
     udev_rule_content = f'SUBSYSTEM=="usb", ATTRS{{idVendor}}=="{vendor_id_hex}", ATTRS{{idProduct}}=="{product_id_hex}", MODE="0666"'
 
-    # Specify the path to the udev rules directory and file
+    # Especificar la ruta al directorio y archivo de reglas udev
     udev_rules_dir = "/etc/udev/rules.d"
     udev_rules_file = os.path.join(udev_rules_dir, "scansecurity_printer.rules")
 
-    # Check if the udev rules file already exists
+    # Verificar si el archivo de reglas udev ya existe
     if os.path.exists(udev_rules_file):
-        print(f"The udev rules file {udev_rules_file} already exists.")
+        print(f"El archivo de reglas udev {udev_rules_file} ya existe.")
     else:
-        # Write the udev rule content to a temporary file
+        # Escribir el contenido de la regla udev en un archivo temporal
         tmp_file_path = "/tmp/scansecurity_printer.rules"
 
         with open(tmp_file_path, "w") as tmp_file:
             tmp_file.write(udev_rule_content)
 
-        # Use sudo to move the temporary file to the udev rules directory
+        # Utilizar sudo para mover el archivo temporal al directorio de reglas udev
         subprocess.run(["sudo", "mv", tmp_file_path, udev_rules_file])
 
-
-        # Reload udevadm rules
+        # Recargar las reglas de udevadm
         os.system("sudo udevadm control --reload-rules")
-        print(f"The udev rules file {udev_rules_file} has been created and udevadm rules reloaded.")
+        print(f"Se ha creado el archivo de reglas udev {udev_rules_file} y se han recargado las reglas de udevadm.")
+
 
 
 def find_usb_printer():
-    # Run lsusb command to get USB device information
+    # Ejecutar el comando lsusb para obtener información sobre los dispositivos USB
     lsusb_output = subprocess.check_output(["lsusb"]).decode("utf-8")
 
-    # Split the output into lines
+    # Dividir la salida en líneas
     lines = lsusb_output.strip().split("\n")
 
-    # Iterate over the lines and find the line containing the keyword "printer"
+    # Iterar sobre las líneas y encontrar la línea que contiene la palabra clave "printer"
     for line in lines:
         print(line)
         if "printer" in line.lower():
-            # Extract the vendor ID and product ID
+            # Extraer el ID del fabricante y el ID del producto
             vendor_product_ids = line.split("ID ")[1].split(":")
             vendor_id = int(vendor_product_ids[0], 16)
             product_id = int(vendor_product_ids[1].split(" ")[0], 16)
             return vendor_id, product_id
 
-    # If no printer line is found, raise an exception
-    raise Exception("USB printer not found")
+    # Si no se encuentra ninguna línea de impresora, lanzar una excepción
+    raise Exception("Impresora USB no encontrada")
 
 
 if __name__ == "__main__":
-    # Parse command-line arguments
-    parser = argparse.ArgumentParser(description="Generate WiFi QR code")
-    parser.add_argument("username", help="Username for WiFi connection")
-    parser.add_argument("password", help="Password for WiFi connection")
-    parser.add_argument("ap_host", help="Hostname for WiFi connection")
-    parser.add_argument("wifi_ssid", help="Password for WiFi connection")
-    parser.add_argument("password_expiry", help="Password expiration Date/Time")
-    parser.add_argument("business_name", help="Business Name")
-    parser.add_argument("business_address", help="Business Address")
-    parser.add_argument("business_text", help="Business Text Image")
-    parser.add_argument("business_logo", help="Business Logo Image")
+    # Analizar los argumentos de la línea de comandos
+    parser = argparse.ArgumentParser(description="Generar código QR de Wi-Fi")
+    parser.add_argument("username", help="Nombre de usuario para la conexión Wi-Fi")
+    parser.add_argument("password", help="Contraseña para la conexión Wi-Fi")
+    parser.add_argument("ap_host", help="Nombre de host para la conexión Wi-Fi")
+    parser.add_argument("wifi_ssid", help="Nombre de la red Wi-Fi")
+    parser.add_argument("password_expiry", help="Fecha/Hora de expiración de la contraseña")
+    parser.add_argument("business_name", help="Nombre de la empresa")
+    parser.add_argument("business_address", help="Dirección de la empresa")
+    parser.add_argument("business_text", help="Imagen de texto de la empresa")
+    parser.add_argument("business_logo", help="Imagen del logotipo de la empresa")
 
     args = parser.parse_args()
 
-    # Generate the WiFi QR code and print it
+    # Generar el código QR de Wi-Fi e imprimirlo
     generate_wifi_qrcode()

@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Cargando settings generales
-source "$(dirname "$(readlink -f "$BASH_SOURCE")")/../config/config.txt"
-set_scriptdir "$BASH_SOURCE"
+source "$(dirname "$(readlink -f "$BASH_SOURCE")")/../config/config.env"
+SCRIPT_DIR="$(set_scriptdir "$BASH_SOURCE")"
 
 # Cargando settings de red
 attempt_to_load "$AUTH_CONFIG"
@@ -17,6 +17,7 @@ fi
 verify_dependency "command -v freeradius" "sudo apt install freeradius -y"
 verify_dependency "command -v sqlite3" "sudo apt install sqlite3 -y"
 verify_dependency "command -v pwgen" "sudo apt install pwgen -y"
+verify_dependency "command -v inotifywait" "sudo apt install inotify-tools -y"
 
 # Estableciendo los permisos de la carpeta de la base de datos
 change_owner "freerad:freerad" "$RADIUS_DB_FOLDER"
@@ -41,17 +42,25 @@ change_owner "freerad:freerad" "$RADIUS_DB_FOLDER"
 # 	fi
 # fi
 
+# Procesando todas las plantillas
 process_all_templates
+
+# Estableciendo enlaces simbólicos
 delete_if_exists "/etc/freeradius/3.0/clients.conf"
 create_symbolic_link "$SCRIPT_DIR/clients.conf" "/etc/freeradius/3.0/clients.conf" "freerad"
 delete_if_exists "/etc/freeradius/3.0/mods-enabled/sql"
 create_symbolic_link "$SCRIPT_DIR/sql" "/etc/freeradius/3.0/mods-enabled/sql" "freerad"
 delete_if_exists "/etc/freeradius/3.0/sites-enabled/default"
 create_symbolic_link "$SCRIPT_DIR/default" "/etc/freeradius/3.0/sites-enabled/default" "freerad"
-run "sudo systemctl stop freeradius" "Parando FreeRADIUS"
-delete_if_exists "$RADIUS_DB"
-run "sudo systemctl start freeradius" "Iniciando FreeRADIUS"
 
+# Reseteando la base de datos de FreeRADIUS si se ha inicializado mal:
+if [ ! -s "$RADIUS_DB" ]; then
+    run "sudo systemctl stop freeradius" "Parando FreeRADIUS"
+    delete_if_exists "$RADIUS_DB"
+    run "sudo systemctl start freeradius" "Iniciando FreeRADIUS"
+fi
+
+# Creando servicio
 change_mode "+x" "$SCRIPT_DIR/newcred.sh"
 install_service "$SCRIPT_DIR/credential-creation.service" "/etc/systemd/system/credential-creation.service"
 

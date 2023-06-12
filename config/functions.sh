@@ -1,30 +1,38 @@
+# ===== FUNCIONES =====
+
+# Función: get_full_path
+# Descripción: Obtiene la ruta completa de un directorio o archivo.
+#
+# Parámetros:
+#   - path: La ruta del directorio o archivo.
+#   - root_path: La ruta raíz para calcular rutas relativas (opcional).
+
 get_full_path() {
   local path="$1"
   local root_path="$2"
   local full_path
 
-  # Check if the root path is provided
+  # Comprobar si se proporciona la ruta raíz
   if [[ -n "$root_path" ]]; then
-    # Calculate relative path
-    
+    # Calcular la ruta relativa
     full_path="${path#$root_path/}"
     if [[ "$path" == "$root_path" ]]; then
-        full_path="/"
+      full_path="/"
     else
-        full_path="/$full_path"
+      full_path="/$full_path"
     fi
   else
-    # Check if the path is ".."
+    # Comprobar si la ruta es ".."
     if [[ "$path" == ".." ]]; then
-      # Get the parent directory of the current directory
+      # Obtener el directorio padre del directorio actual
       full_path="$(cd "$(dirname "$PWD")" && pwd)"
     else
-      # Check if the path is relative or absolute
+      # Comprobar si la ruta es relativa o absoluta
       if [[ "$path" == /* ]]; then
-        # Absolute path
+        # Ruta absoluta
         full_path="$path"
       else
-        # Relative path
+        # Ruta relativa
         full_path="$(cd "$(dirname "$path")" && pwd)/$(basename "$path")"
       fi
     fi
@@ -33,44 +41,12 @@ get_full_path() {
   echo "$full_path"
 }
 
-# Carpeta de configuración
-CONFIG_DIR="$(dirname "$(readlink -f "$BASH_SOURCE")")"
-
-# Carpeta raíz del proyecto
-BASE_DIR="$(get_full_path "$(dirname "$CONFIG_DIR")")"
-
-# Archivo de ajustes de red
-NETWORK_CONFIG="${CONFIG_DIR}/netconfig.txt"
-# Archivo de ajustes de autenticación
-AUTH_CONFIG="${CONFIG_DIR}/authconfig.txt"
-# Archivo de ajustes de la empresa
-BUSINESS_CONFIG="${CONFIG_DIR}/business.txt"
-
-
-# ---- RUTAS -----
-# Spinner
-SPINNER="${BASE_DIR}/libs/Spinner/newspin.sh"
-# Bluetooth watcher
-BLUETOOTH_EVENTLOG="$(get_full_path "${BASE_DIR}/bluetooth/eventlog.txt")"
-# Ruta de base datos de FreeRADIUS
-RADIUS_DB_FOLDER="/opt/freeradius"
-RADIUS_DB_FILENAME="freeradius.db"
-RADIUS_DB=${RADIUS_DB_FOLDER}/${RADIUS_DB_FILENAME}
-# Nombre de la página web NoDogSplash
-NDS_PAGE="splash.html"
-# Nombre del logotipo NoDogSplash (dentro de la carpeta /images)
-
-BLUETOOTH_EVENT="Click!"
-
-
-# ===== FUNCIONES =====
-
-# Función que establece la variable SCRIPT_DIR con la ruta del directorio del script actual.
+# Función que la ruta del directorio del script actual.
 # Parámetros:
 #   - location: la ubicación del script actual.
 set_scriptdir() {
     local location="$1"
-    SCRIPT_DIR="$(dirname "$(readlink -f "$location")")"
+    echo "$(dirname "$(readlink -f "$location")")"
 }
 
 # Intenta cargar un archivo y muestra un mensaje de error si no se encuentra.
@@ -88,11 +64,14 @@ attempt_to_load() {
     source "$file"
 }
 
-# Crea un enlace simbólico desde una ruta de destino a una ruta de enlace especificada y cambia el propietario.
+# Función: create_symbolic_link
+# Descripción: Crea un enlace simbólico desde una ruta de destino a una ruta de enlace especificada y cambia el propietario.
+#
 # Parámetros:
-#   - target_path: la ruta de destino del enlace simbólico.
-#   - link_path: la ruta del enlace simbólico a crear.
-#   - owner: el propietario del enlace simbólico.
+#   - target_path: La ruta de destino del enlace simbólico.
+#   - link_path: La ruta del enlace simbólico a crear.
+#   - owner: El propietario del enlace simbólico.
+
 create_symbolic_link() {
     local target_path="$1"
     local link_path="$2"
@@ -114,22 +93,27 @@ change_owner() {
     run "sudo chown \"$owner\" \"$target_path\"" "Cambiando dueño: \"$owner\" \"$target_path\""
 }
 
-# Elimina un archivo o directorio si existe.
+# Función: eliminar_si_existe
+# Descripción: Elimina un archivo o directorio si existe.
+#
 # Parámetros:
 #   - file: el archivo o directorio a eliminar.
+
 delete_if_exists() {
     local file="$1"
+
     if sudo test -d "$file"; then
-        # Deleting directory
+        # Eliminando directorio
         run "sudo rm -r \"$file\"" "Eliminando directorio: $file"
     fi
+
     if sudo test -e "$file"; then
-        # Deleting file
+        # Eliminando archivo
         run "sudo rm \"$file\"" "Eliminando fichero: $file"
     fi
+
     if sudo test -L "$file" && ! sudo test -e "$file"; then
-        # Deleting broken symlink
-        # echo "'$file' is a broken symlink"
+        # Eliminando enlace simbólico roto
         run "sudo rm \"$file\"" "Eliminando enlace roto: $file"
     fi
 }
@@ -188,78 +172,123 @@ process_all_templates() {
     done
 }
 
-# Verifica una dependencia y la instala si es necesario.
+# Función: verify_dependency
+# Descripción: Verifica una dependencia y la instala si es necesario.
+#
 # Parámetros:
-#   - command_name: el nombre del comando a verificar.
-#   - install_command: el comando para instalar la dependencia.
+#   - command_name: El nombre del comando a verificar.
+#   - install_command: El comando para instalar la dependencia.
+
 verify_dependency() {
+    local command_name="$1"
+    local install_command="$2"
+
     # Comprueba si el comando está instalado
-    #if command -v "$1" >/dev/null 2>&1; then
-    run "--quiet" "$1" "Comprobando disponibilidad: \"$1\""
-    if [ $? -ne 0 ]; then 
+    run "--quiet" "$command_name" "Comprobando disponibilidad: \"$command_name\""
+
+    if [ $? -ne 0 ]; then
         # Realiza la instalación utilizando el comando proporcionado
-        run "$2" "Instalando $2"
+        run "$install_command" "Instalando $install_command"
     fi
 }
 
-run() {
-    spinner_file="$SPINNER"
 
-    # Check if spinner file exists and is executable
+
+# Función: run
+# Descripción: Ejecuta un comando con un spinner si el archivo spinner está disponible, de lo contrario, simplemente ejecuta el comando.
+#
+# Parámetros:
+#   - command: El comando a ejecutar.
+
+run() {
+    local spinner_file="$SPINNER"
+
+    # Comprueba si el archivo del spinner existe y es ejecutable
     if [ -x "$spinner_file" ]; then
         "$spinner_file" "$@"
     else
-        echo "Spinner file not found or not executable."
-	if [ "$1" = "-q" ] || [ "$1" = "--quiet" ]; then
-		shift
-	fi
-	echo "will run \"$1\""
-	eval "$1"
+        echo "Archivo del spinner no encontrado o no ejecutable."
+        if [ "$1" = "-q" ] || [ "$1" = "--quiet" ]; then
+            shift
+        fi
+        echo "Ejecutando \"$1\""
+        eval "$1"
     fi
 }
 
-
-
-
-
+# Función: change_directory
+# Descripción: Cambia al directorio especificado y muestra el directorio completo antes de cambiar.
+#
+# Parámetros:
+#   - directory: El directorio al que se desea cambiar.
 
 change_directory() {
-    full_path=$(get_full_path "$(get_full_path "$1")" "$BASE_DIR") #  
-    if run "cd $1" "Cambiando al directorio: $full_path"; then
-        cd $1
+    local directory="$1"
+    local full_path=$(get_full_path "$(get_full_path "$directory")" "$BASE_DIR")
+
+    if run "cd $directory" "Cambiando al directorio: $full_path"; then
+        cd "$directory"
         return 0
-    else 
+    else
         return $?
     fi
 }
 
+# Función: test_execute
+# Descripción: Verifica si un script es ejecutable.
+#
+# Parámetros:
+#   - script: La ruta completa del script a verificar.
+
 test_execute() {
-    local script="$(get_full_path "$1")"
-    
-    if [[ -x "$script" ]]; then
+    local script="$1"
+    local script_full="$(get_full_path "$1")"
+
+    if [[ -x "$script_full" ]]; then
         return 0
     else
         return 1
     fi
 }
 
-execute() {
-    local executable="$(get_full_path "$1")"
+# Función: execute
+# Descripción: Ejecuta un archivo ejecutable.
+#
+# Parámetros:
+#   - executable: La ruta completa del archivo ejecutable a ejecutar.
 
-    echo "$(test_execute "$executable")"
-    
-    if run "--quiet" "file \"$executable\" | grep \"executable\"" "Ejecutando: \"$executable\"" ; then
-        bash "$executable"
+execute() {
+    local executable="$1"
+    local executable_full="$(get_full_path "$1")"
+
+    if run "--quiet" "file \"$executable_full\" | grep \"executable\"" "Ejecutando: \"$executable_full\""; then
+        bash "$executable_full"
     fi
 }
+
+# Función: verify_pip_dependency
+# Descripción: Verifica una dependencia de pip y la instala si es necesario.
+#
+# Parámetros:
+#   - dependency: El nombre de la dependencia a verificar e instalar.
 
 verify_pip_dependency() {
-    run "--quiet" "pip show $1 -q" "Comprobando disponibilidad: \"$1\""
-    if [ $? -ne 0 ]; then 
+    local dependency="$1"
+    # Comprueba la instalación de la dependencia
+    run "--quiet" "pip show $dependency -q" "Comprobando disponibilidad: \"$dependency\""
+
+    if [ $? -ne 0 ]; then
         # Realiza la instalación utilizando el comando proporcionado
-        run "pip install $1" "Instalando $1 con pip"
+        run "pip install $dependency" "Instalando $dependency con pip"
     fi
 }
+
+# Función: change_mode
+# Descripción: Cambia los permisos de un archivo o directorio.
+#
+# Parámetros:
+#   - mode: Los permisos a establecer.
+#   - target: El archivo o directorio al que se le cambiarán los permisos.
 
 change_mode() {
     local mode="$1"
@@ -267,6 +296,13 @@ change_mode() {
     run "sudo chmod $mode $target" "Cambiando permisos: $target"
 }
 
+
+# Función: install_service
+# Descripción: Instala un servicio utilizando un archivo de plantilla.
+#
+# Parámetros:
+#   - service_template: La ruta del archivo de plantilla del servicio.
+#   - service_file: La ruta del archivo de servicio a crear.
 install_service() {
     local service_template="$1"
     local service_file="$2"
@@ -274,10 +310,10 @@ install_service() {
     create_symbolic_link "$service_template" "$service_file" "root"
     change_mode "644" "$service_file"
 
-    # Reload systemd configuration
-    run "sudo systemctl daemon-reload"
+    # Recargar la configuración de systemd
+    run "sudo systemctl daemon-reload" "recargando systemctl"
 
-    # Enable and start the service
-    run "sudo systemctl enable $service_name"
-    run "sudo systemctl start $service_name"
+    # Habilitar y iniciar el servicio
+    run "sudo systemctl enable $service_name" "habilitando servicio $service_name"
+    run "sudo systemctl start $service_name" "iniciando servicio $service_name"
 }
