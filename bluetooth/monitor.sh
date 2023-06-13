@@ -50,7 +50,7 @@ while ! bluetoothctl info "$BLUETOOTH_DEVICE" | grep -q "Paired: yes"; do
     fi
 
     # Esperar un corto período antes del próximo intento
-    sleep 1
+    sleep "$BLUETOOTH_TIMEOUT"
 done
 while ! bluetoothctl info "$BLUETOOTH_DEVICE" | grep -q "Connected: yes"; do
     bluetoothctl connect "$BLUETOOTH_DEVICE"
